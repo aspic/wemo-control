@@ -1,11 +1,68 @@
 var enabledKey = "10006";
 var dimKey = "10008";
 
+var menu = ["home", "devices"];
+
 class Container extends React.Component {
+    constructor() {
+        super();
+        this.state = {section: menu[0]};
+        this.sectionChooser = this.sectionChooser.bind(this);
+    }
+    sectionChooser(section) {
+        this.setState({section: section});
+    }
     render() {
+        var chosen = this.state.section;
+        var section;
+        // TODO: map to components
+        if(chosen === "devices") {
+            section = <Devices />
+        } else if(chosen === "home") {
+            section = <Home />
+        }
         return <div className="container">
-                <Devices />  
+                <Navbar menuSelect={this.sectionChooser} section={this.state.section}/>
+                {section}
                </div>;
+    }
+}
+
+class Navbar extends React.Component {
+    constructor() {
+        super();
+        this.select = this.select.bind(this);
+    }
+    select(key) {
+        this.props.menuSelect(key);
+    }
+    render() {
+        var cmp = this;
+        var sections = menu.map(function(item) {
+            return <NavItem key={item} name={item} handler={cmp.select} chosen={cmp.props.section}/>;
+        });
+        return  <nav className="navbar navbar-dark bg-inverse">
+                 <a className="navbar-brand" href="#">Wemo Control</a>
+                 <ul className="nav navbar-nav">
+                  {sections}
+                 </ul>
+                </nav>
+    }
+}
+
+class NavItem extends React.Component {
+    render() {
+        var key = this.props.name;
+        var classes = "nav-item" + (key === this.props.chosen ? " active" : "");
+
+        return  <li className={classes}>
+                 <a className="nav-link" onClick={this.props.handler.bind(this, key)}>{key}</a>
+                </li>
+    }
+}
+class Home extends React.Component {
+    render() {
+        return <div>home..</div>
     }
 }
 
@@ -25,7 +82,7 @@ class Devices extends React.Component {
 
     render() {
         var test = this.state.devices.map(function(device) {
-            return <Device device={device} />;
+            return <Device key={device.deviceId} device={device} />;
         });
         return <div className="row col-md-12">{test}</div>;
     }
