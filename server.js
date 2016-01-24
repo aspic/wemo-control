@@ -17,15 +17,19 @@ app.get('/api/devices', function (req, res) {
     res.send(control.endDevices());
 });
 
-app.get('/api/light/:id/:toggle', function (req, res) {
+app.get('/api/device/:id/:toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
     var action = req.param("toggle");
-    control.toggle(id, action);
-
-    res.send({status: "ok"});
+    control.toggle(id, action, function(device) {
+        if(device) {
+            res.send(device);
+        } else {
+            res.send({ error: 'not found' });
+        }
+    });
 });
-app.get('/api/light/:id/level/:level', function (req, res) {
+app.get('/api/device/:id/level/:level', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
     var level = req.param("level");
