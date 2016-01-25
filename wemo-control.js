@@ -37,9 +37,12 @@ exports.toggle = function(deviceId, action, cb) {
     });
 };
     
-exports.dim = function(deviceId, value, time) {
+exports.dim = function(deviceId, value, time, cb) {
     client.setDeviceStatus(deviceId, 10008, value + ":" + time, function(err, resp) {
-        // TODO
+        exports.reload(function(devices) {
+            var device = filterDevice(deviceId, devices);
+            cb(device);
+        });
     });
 };
 
