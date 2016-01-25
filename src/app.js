@@ -1,7 +1,7 @@
 var enabledKey = "10006";
 var dimKey = "10008";
 
-var menu = ["home", "devices"];
+var menu = ["devices", "home"];
 
 class Container extends React.Component {
     constructor() {
@@ -91,39 +91,70 @@ class Devices extends React.Component {
 class Device extends React.Component {
     constructor() {
         super();
-        this.state = {clicked: false};
+        this.state = {clicked: false, device: {}};
         this.clicked = this.clicked.bind(this);
+        this.dimmed = this.dimmed.bind(this);
     }
     componentWillMount() {
-        var enabled = this.props.device.capabilities[enabledKey];
+        var device = this.props.device;
+        var enabled = device.capabilities[enabledKey]
         if(enabled == 1) {
             this.setState({clicked: true});
         }
+        this.setState({device: device});
     }
     clicked() {
-        var nextState = !this.state.clicked;
-        var id = this.props.device.deviceId;
-        var action = nextState ? "on" : "off";
         var cmp = this;
+        var nextState = !this.state.clicked;
+        var id = this.state.device.deviceId;
+        var action = nextState ? "on" : "off";
         $.ajax("/api/device/" + id + "/" + action).then(function(data) {
             if(data) {
-                var isEnabled = data.capabilities[enabledKey] == 1;
-                cmp.setState({clicked: isEnabled});
+                var device = data;
+                var isEnabled = device.capabilities[enabledKey] == 1;
+                cmp.setState({clicked: isEnabled, device: device});
+            }
+        });
+    }
+    dimmed(value) {
+        var cmp = this;
+        var id = this.state.device.deviceId;
+        $.ajax("/api/device/" + id + "/level/" + value).then(function(data) {
+            if(data) {
+                cmp.setState({device: data});
             }
         });
     }
     render() {
-        var name = this.props.device.friendlyName;
-        var classes = "btn " + (this.state.clicked ? " btn-success active" : " btn-secondary");
+        var name = this.state.device.friendlyName;
+        var classes = "icon-tinted" + (this.state.clicked ? " active" : "");
         var text = this.state.clicked ? "Off" : "On";
-        return <div>
-             <i className="fa fa-lightbulb-o"></i> {name}
-             <div>
-              <button onClick={this.clicked} type="button" className={classes} data-toggle="button">
-              {text}
-              </button>
-             </div>
+        var dimValue = this.state.device.capabilities[dimKey].split(":")[0];
+        return <div className="row col-md-12 m-t-1">
+                <div className="row col-md-12">
+                 <div>
+                  <h4>
+                   <a href="#" className={classes} onClick={this.clicked}><i className="fa fa-lightbulb-o fa-lg"></i></a> {name}
+                  </h4>
+                 </div>
+                 <div>
+                  <Slider value={dimValue} dimmer={this.dimmed}/>
+                 </div>
+                </div>
             </div>;
+    }
+}
+
+class Slider extends React.Component {
+    constructor() {
+        super();
+        this.onChange = this.onChange.bind(this);
+    }
+    onChange(event) {
+        this.props.dimmer(event.target.value);
+    }
+    render() {
+        return <div>0 <input type="range" min="0" max="255" defaultValue={this.props.value} onMouseUp={this.onChange}></input> 100</div>
     }
 }
 
