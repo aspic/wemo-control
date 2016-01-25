@@ -33,16 +33,20 @@ app.get('/api/device/:id/level/:level', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
     var level = req.param("level");
-    control.dim(id, level, 0);
-
-    res.send({status: "ok"});
+    control.dim(id, level, 0, function(device) {
+        if(device) {
+            res.send(device);
+        } else {
+            res.send({ error: 'not found' });
+        }
+    });
 });
 
 app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
-app.listen(3000, 'localhost', function (err) {
+app.listen(3000, function (err) {
   if (err) {
     return console.error(err);
   }
