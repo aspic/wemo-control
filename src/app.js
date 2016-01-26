@@ -154,7 +154,7 @@ class Slider extends React.Component {
         this.props.dimmer(event.target.value);
     }
     render() {
-        return <div>0 <input type="range" min="0" max="255" defaultValue={this.props.value} onMouseUp={this.onChange}></input> 100</div>
+        return <div>0 <input type="range" min="0" max="255" defaultValue={this.props.value} onMouseUp={this.onChange} onTouchEnd={this.onChange}></input> 100</div>
     }
 }
 
