@@ -134,7 +134,7 @@ class Device extends React.Component {
                 <div className="row col-md-12">
                  <div>
                   <h4>
-                   <a href="#" className={classes} onClick={this.clicked}><i className="fa fa-lightbulb-o fa-lg"></i></a> {name}
+                   <a className={classes} onClick={this.clicked}><i className="fa fa-lightbulb-o fa-lg"></i></a> {name}
                   </h4>
                  </div>
                  <div>
