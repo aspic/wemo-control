@@ -7,7 +7,11 @@ I got my hands on a couple of [wemo lights](http://www.belkin.com/us/p/P-F7C033/
 * [wemo client for node](https://github.com/timonreinhard/wemo-client) (interface to manage wemo)
 * .. some react, babel, bootstrap and font-awesome for the front-end
 
-## Run the application
+## Install and run
+
+    // Install dependencies
+    $ npm install express wemo-client
+    // Run
     $ node server.js
 
 This starts the server and exposes the web application on ```http://localhost:3000```
