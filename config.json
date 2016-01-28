@@ -1,0 +1,12 @@
+{
+          "rules": [
+                      {
+                                    "name": "theater",
+                                          "icon": "theater.png",
+                                                "devices": [
+                                                                "94103EF6BF42ED01"
+                                                                      ],
+                                                      "brightness": 100
+                                                                  }
+            ]
+}
