@@ -45,9 +45,12 @@ app.get('/api/device/:id/level/:level', function (req, res) {
 });
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
+    var allRules = {};
     if (config) {
-        res.send(config["rules"]);
+        allRules["available"] = config["rules"];
     }
+    allRules["active"] = control.activeRules();
+    res.send(allRules);
 });
 
 app.get('/api/rules/:rule/:action', function (req, res) {
