@@ -50,22 +50,22 @@ app.get('/api/rules/', function(req, res) {
     }
 });
 
-app.get('/api/rules/:rule/:apply', function (req, res) {
+app.get('/api/rules/:rule/:action', function (req, res) {
     var ruleKey = req.param("rule");
-    var apply = req.param("apply");
+    var action= req.param("action");
     var rules = config.rules;
 
-    if(apply && rules && rules.length > 0) {
+    if(action === "enable" && rules && rules.length > 0) {
         for(var i = 0; i < rules.length; i++) {
             var rule = rules[i];
             if(ruleKey == rule.name) {
                 control.applyRule(rule);
-                res.send({rule: 'applied'});
+                res.send({status: 'ok'});
                 return;
             }
         }
     } 
-    res.send({ error: 'not found' });
+    res.send({status: 'not found'});
 });
 
 app.get('*', function (req, res) {
