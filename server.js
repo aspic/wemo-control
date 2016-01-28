@@ -6,7 +6,7 @@ var app = express();
 var control = require('./wemo-control');
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-control.init();
+control.init(config);
 
 app.use('/build', express.static('build'));
 
@@ -45,28 +45,17 @@ app.get('/api/device/:id/level/:level', function (req, res) {
 });
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    var allRules = {};
-    if (config) {
-        allRules["available"] = config["rules"];
-    }
-    allRules["active"] = control.activeRules();
-    res.send(allRules);
+    res.send(control.rules());
 });
 
 app.get('/api/rules/:rule/:action', function (req, res) {
     var ruleKey = req.param("rule");
     var action= req.param("action");
-    var rules = config.rules;
 
-    if(action === "enable" && rules && rules.length > 0) {
-        for(var i = 0; i < rules.length; i++) {
-            var rule = rules[i];
-            if(ruleKey == rule.name) {
-                control.applyRule(rule);
-                res.send({status: 'ok'});
-                return;
-            }
-        }
+    if(action === "enable") {
+        var applied = control.applyRule(ruleKey);
+        res.send(applied);
+        return;
     } 
     res.send({status: 'not found'});
 });

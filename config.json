@@ -1,6 +1,6 @@
 {
-          "rules": [
-                      {
+          "rules": {
+                      "theater": {
                                     "name": "theater",
                                           "icon": "theater.png",
                                                 "devices": [
@@ -8,5 +8,5 @@
                                                                       ],
                                                       "brightness": 100
                                                                   }
-            ]
+          }
 }

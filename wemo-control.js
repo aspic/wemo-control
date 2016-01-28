@@ -5,13 +5,14 @@ var Wemo = require('wemo-client');
 var wemo = new Wemo();
 var client; 
 var endDevices = [];
-var rules = [];
+var rules;
 
-exports.init = function() {
+exports.init = function(config) {
     wemo.discover(function(deviceInfo) {
         client = wemo.client(deviceInfo);
         exports.reload();
     });
+    rules = config.rules;
 };
 
 exports.reload = function(cb) {
@@ -51,26 +52,29 @@ exports.dim = function(deviceId, value, time, cb) {
     });
 };
 
-exports.applyRule = function(rule) {
-    var devices = rule.devices;
-    var brightness = rule.brightness;
-    var handled = false;
+exports.applyRule = function(ruleKey) {
+    var rule = rules[ruleKey];
 
-    for(var i = 0; i < devices.length; i++) {
-        var deviceId = devices[i];
-        if(brightness) {
-            exports.dim(deviceId, brightness, 0);
-            handled = true;
-        }
-    } 
-    if(handled) {
-        rules.push(rule);
+    if(rule) {
+        var devices = rule.devices;
+        var brightness = rule.brightness;
+        var handled = false;
+
+        for(var i = 0; i < devices.length; i++) {
+            var deviceId = devices[i];
+            if(brightness) {
+                exports.dim(deviceId, brightness, 0);
+                handled = true;
+            }
+        } 
+        rule.active = handled;
     }
+    return rule;
 };
 
-exports.activeRules = function() {
+exports.rules = function() {
     return rules;
-};
+}
 
 function filterDevice(deviceId, devices) {
     var device;
