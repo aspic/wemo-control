@@ -63,25 +63,29 @@ class NavItem extends React.Component {
 class Home extends React.Component {
     constructor() {
         super();
-        this.state = {rules: []};
+        this.state = {};
     }
 
     componentWillMount() {
         var cmp = this;
         $.ajax("/api/rules").then(function(data) {
-            cmp.setState({rules: data});
-            console.log(data);
+            cmp.setState(data);
         });
     }
 
     render() {
-        var rules = this.state.rules.map(function(rule) {
-            return <Rule key={rule.name} rule={rule} />
-        });
+        var available = [];
+
+        for(var key in this.state) {
+            if(this.state.hasOwnProperty(key)) {
+                var rule = this.state[key];
+                available.push(<Rule key={rule.name} rule={rule} />);
+            }
+        }
 
         return  <div className="row col-md-12">
                  <h3>Configured rules</h3> 
-                 {rules}
+                 {available}
                 </div>;
     }
 }
@@ -96,13 +100,13 @@ class Rule extends React.Component {
         var cmp = this;
         var rule = this.props.rule.name;
         $.ajax("/api/rules/" + rule + "/enable").then(function(data) {
-            if(data.status === "ok") {
+            if(data && data.active) {
                 cmp.setState({enabled: true});
             }
         });
     }
     render() {
-        var toggle = this.state.enabled ? "fa fa-toggle-on" : "fa fa-toggle-off";
+        var toggle = (this.props.rule.active || this.state.enabled) ? "fa fa-toggle-on" : "fa fa-toggle-off";
 
         return  <div>
                  {this.props.rule.name}
