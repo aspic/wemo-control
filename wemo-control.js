@@ -32,7 +32,9 @@ exports.toggle = function(deviceId, action, cb) {
     client.setDeviceStatus(deviceId, 10006, actionId, function(err, resp) {
         exports.reload(function(devices) {
             var device = filterDevice(deviceId, devices);
-            cb(device);
+            if(cb) {
+                cb(device);
+            }
         });
     });
 };
@@ -41,9 +43,23 @@ exports.dim = function(deviceId, value, time, cb) {
     client.setDeviceStatus(deviceId, 10008, value + ":" + time, function(err, resp) {
         exports.reload(function(devices) {
             var device = filterDevice(deviceId, devices);
-            cb(device);
+            if(cb) {
+                cb(device);
+            }
         });
     });
+};
+
+exports.applyRule = function(rule) {
+    var devices = rule.devices;
+    var brightness = rule.brightness;
+
+    for(var i = 0; i < devices.length; i++) {
+        var deviceId = devices[i];
+        if(brightness) {
+            exports.dim(deviceId, brightness, 0);
+        }
+    } 
 };
 
 function filterDevice(deviceId, devices) {

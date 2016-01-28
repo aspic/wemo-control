@@ -1,8 +1,10 @@
 var path = require('path');
 var express = require('express');
-var app = express();
+var fs = require('fs');
 
+var app = express();
 var control = require('./wemo-control');
+var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 control.init();
 
@@ -40,6 +42,30 @@ app.get('/api/device/:id/level/:level', function (req, res) {
             res.send({ error: 'not found' });
         }
     });
+});
+app.get('/api/rules/', function(req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    if (config) {
+        res.send(config["rules"]);
+    }
+});
+
+app.get('/api/rules/:rule/:apply', function (req, res) {
+    var ruleKey = req.param("rule");
+    var apply = req.param("apply");
+    var rules = config.rules;
+
+    if(apply && rules && rules.length > 0) {
+        for(var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if(ruleKey == rule.name) {
+                control.applyRule(rule);
+                res.send({rule: 'applied'});
+                return;
+            }
+        }
+    } 
+    res.send({ error: 'not found' });
 });
 
 app.get('*', function (req, res) {
