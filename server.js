@@ -45,19 +45,15 @@ app.get('/api/device/:id/level/:level', function (req, res) {
 });
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    res.send(control.allRules());
+    res.send(control.rulesAsActive());
 });
 
-app.get('/api/rules/:rule/:action', function (req, res) {
+app.get('/api/rules/:rule/toggle', function (req, res) {
     var ruleKey = req.param("rule");
-    var action= req.param("action");
-
-    if(action === "enable") {
-        var applied = control.applyRule(ruleKey);
-        res.send(applied);
-        return;
-    } 
-    res.send({status: 'not found'});
+    if(ruleKey) {
+        control.toggleRule(ruleKey);
+    }
+    res.send(control.rulesAsActive());
 });
 
 app.get('*', function (req, res) {

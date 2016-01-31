@@ -1,7 +1,7 @@
 var enabledKey = "10006";
 var dimKey = "10008";
 
-var menu = ["devices", "home"];
+var menu = ["devices", "rules"];
 
 class Container extends React.Component {
     constructor() {
@@ -18,7 +18,7 @@ class Container extends React.Component {
         // TODO: map to components
         if(chosen === "devices") {
             section = <Devices />
-        } else if(chosen === "home") {
+        } else if(chosen === "rules") {
             section = <Home />
         }
         return <div className="container">
@@ -63,27 +63,36 @@ class NavItem extends React.Component {
 class Home extends React.Component {
     constructor() {
         super();
-        this.state = {rules: {}, activeRules: []};
+        this.state = {};
+        this.toggleRule = this.toggleRule.bind(this);
     }
 
     componentWillMount() {
         var cmp = this;
         $.ajax("/api/rules").then(function(data) {
+            console.log(data);
+            cmp.setState(data);
+        });
+    }
+
+    toggleRule(ruleName) {
+        var cmp = this;
+        $.ajax("/api/rules/" + ruleName + "/toggle").then(function(data) {
             cmp.setState(data);
         });
     }
 
     render() {
         var available = [];
-        var rules = this.state.rules;
+        var rules = this.state;
+        var cmp = this;
 
         for(var key in rules) {
             if(rules.hasOwnProperty(key)) {
                 var rule = rules[key];
-                available.push(<Rule key={rule.name} rule={rule} />);
+                available.push(<Rule key={rule.name} rule={rule} toggleRule={this.toggleRule}/>);
             }
         }
-
         return  <div className="row col-md-12">
                  <h3>Configured rules</h3> 
                  {available}
@@ -94,24 +103,13 @@ class Home extends React.Component {
 class Rule extends React.Component {
     constructor() {
         super();
-        this.state = {enabled: false};
-        this.activate = this.activate.bind(this);
-    }
-    activate() {
-        var cmp = this;
-        var rule = this.props.rule.name;
-        $.ajax("/api/rules/" + rule + "/enable").then(function(data) {
-            if(data && data.active) {
-                cmp.setState({enabled: true});
-            }
-        });
     }
     render() {
-        var toggle = (this.props.rule.active || this.state.enabled) ? "fa fa-toggle-on" : "fa fa-toggle-off";
+        var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
 
         return  <div>
+                 <a onClick={this.props.toggleRule.bind(this, this.props.rule.name)}> <i className={toggle}></i> </a>
                  {this.props.rule.name}
-                 <a onClick={this.activate}> <i className={toggle}></i></a>
                 </div>
     }
 }

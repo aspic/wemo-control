@@ -1,6 +1,7 @@
 /**
  * https://github.com/timonreinhard/wemo-client
  */
+var Immutable = require('immutable');
 var Wemo = require('wemo-client');
 var wemo = new Wemo();
 var client; 
@@ -55,40 +56,66 @@ exports.dim = function(deviceId, value, time, cb) {
     });
 };
 
-exports.applyRule = function(ruleKey) {
+exports.toggleRule = function(ruleKey) {
     var rule = rules[ruleKey];
-
     if(rule) {
-        var devices = rule.devices;
-        var brightness = rule.brightness;
-        var handled = false;
-
-        for(var i = 0; i < devices.length; i++) {
-            var deviceId = devices[i];
-            if(brightness) {
-                exports.dim(deviceId, brightness, 0);
-                handled = true;
-            }
-        } 
-        if(handled) {
-            activeRules.push(rule);
-        }
-
-        rule.active = handled;
+        isActive(rule) ? disableRule(rule) : enableRule(rule);
     }
-    return rule;
+
+    return exports.rulesAsActive();
+}
+
+function disableRule(rule) {
+    for(var i = 0; i < activeRules.length; i++) {
+        var activeRule = activeRules[i];
+        if(rule.name === activeRule.name) {
+            activeRules.splice(i, 1);
+            break;
+        }
+    }    
+    if(activeRules.length > 0) {
+        // Re-applies last rule
+        applyRule(activeRules[activeRules.length - 1]);
+    }
+}
+
+function enableRule(rule) {
+    if(applyRule(rule)) {
+        activeRules.push(rule);
+    }
 };
+
+function applyRule(rule) {
+    var devices = rule.devices;
+    var brightness = rule.brightness;
+    var handled = false;
+
+    for(var i = 0; i < devices.length; i++) {
+        var deviceId = devices[i];
+        if(brightness) {
+            exports.dim(deviceId, brightness, 0);
+            handled = true;
+        }
+    } 
+    return handled;
+}
 
 exports.rules = function() {
     return rules;
 }
 
-exports.activeRules = function() {
-    return activeRules;
-}
-
-exports.allRules = function() {
-    return {rules: rules, activeRules: activeRules};
+exports.rulesAsActive = function() {
+    var active = {};
+    Object.keys(rules).forEach(function(key) {
+        var rule = Immutable.Map(rules[key])
+        if(isActive(key)) {
+            rule = rule.set('active', true);
+        }
+        console.log(rule);
+        rule = rule.set('devices', deviceIdsToDevices(rule.get('devices')));
+        active[key] = rule;
+    });
+    return active;
 }
 
 function filterDevice(deviceId, devices) {
@@ -100,4 +127,24 @@ function filterDevice(deviceId, devices) {
         }
     }
     return device;
+}
+
+function isActive(ruleName) {
+    for(var i = 0; i < activeRules.length; i++) {
+        if(activeRules[i].name === ruleName) {
+            return true;
+        } 
+    }
+    return false;
+}
+
+function deviceIdsToDevices(devices) {
+    return devices.map(function(deviceId) {
+        for(var i = 0; i < endDevices.length; i++) {
+            var device = endDevices[i];
+            if(device.deviceId === deviceId) {
+                return device;
+            }
+        }           
+    });
 }

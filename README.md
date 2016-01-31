@@ -5,12 +5,13 @@ I got my hands on a couple of [wemo lights](http://www.belkin.com/us/p/P-F7C033/
 * [node js](https://nodejs.org/) (server back end)
 * [node express](http://expressjs.com/) (routing and request/response handling)
 * [wemo client for node](https://github.com/timonreinhard/wemo-client) (interface to manage wemo)
+* [immutable-js](https://github.com/facebook/immutable-js) 
 * .. some react, babel, bootstrap and font-awesome for the front-end
 
 ## Install and run
 
     // Install dependencies
-    $ npm install express wemo-client
+    $ npm install express wemo-client immutable
     // Run
     $ node server.js
 
