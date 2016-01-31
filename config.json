@@ -6,8 +6,11 @@
         "theater": {
             "name": "theater",
             "icon": "theater.png",
-            "devices": [ "94103EF6BF42ED01"],
-            "brightness": 100
+            "deviceRules": {
+                "1448121747": {
+                    "brightness": "128"
+                }
+            }
         }
     }
 }

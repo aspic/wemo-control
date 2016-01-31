@@ -104,6 +104,7 @@ class Rule extends React.Component {
     constructor() {
         super();
         this.valueControl = this.valueControl.bind(this);
+        this.updateRule = this.updateRule.bind(this);
         this.state = {deviceRules: {}};
     }
     valueControl(id, key, value) {
@@ -113,6 +114,22 @@ class Rule extends React.Component {
         }
         deviceRules[id][key] = value;
         this.setState({deviceRules: deviceRules});
+        this.updateRule();
+    }
+    updateRule() {
+        var key = this.props.rule.name;
+        var rule = this.props.rule;
+        rule["deviceRules"] = this.state.deviceRules;
+        $.ajax({
+            url: "/api/rule/" + key + "/update",
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            success: function (data) {
+                console.log(data);
+            },
+            data: JSON.stringify(rule)
+        });
     }
     render() {
         var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";

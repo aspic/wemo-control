@@ -1,8 +1,15 @@
+/** dependencies */
 var path = require('path');
 var express = require('express');
+var bodyParser = require("body-parser");
 var fs = require('fs');
 
+/** create app and register middleware */
 var app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+/** run wemo and load config */
 var control = require('./wemo-control');
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
@@ -44,6 +51,12 @@ app.get('/api/device/:id/level/:level', function (req, res) {
 });
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
+    res.send(control.rulesAsActive());
+});
+
+app.post('/api/rule/:rule/update', function(req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    control.updateRule(req.body);
     res.send(control.rulesAsActive());
 });
 

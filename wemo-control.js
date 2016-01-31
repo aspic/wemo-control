@@ -37,7 +37,10 @@ exports.toggle = function(deviceId, cb) {
     var device = filterDevice(deviceId, endDevices);
     var enabled = lightEnabled(device);
     var actionId = enabled ? 0 : 1;
-    
+    controlLight(deviceId, actionId, cb); 
+};
+
+function controlLight(deviceId, actionId, cb) {
     client.setDeviceStatus(deviceId, 10006, actionId, function(err, resp) {
         exports.reload(function(devices) {
             var device = filterDevice(deviceId, devices);
@@ -46,7 +49,7 @@ exports.toggle = function(deviceId, cb) {
             }
         });
     });
-};
+}
     
 exports.dim = function(deviceId, value, time, cb) {
     client.setDeviceStatus(deviceId, 10008, value + ":" + time, function(err, resp) {
@@ -62,10 +65,19 @@ exports.dim = function(deviceId, value, time, cb) {
 exports.toggleRule = function(ruleKey) {
     var rule = rules[ruleKey];
     if(rule) {
-        isActive(rule) ? disableRule(rule) : enableRule(rule);
+        isActive(ruleKey) ? disableRule(rule) : enableRule(rule);
     }
 
     return exports.rulesAsActive();
+}
+
+exports.updateRule = function(rule) {
+   var newRule = {
+        name: rule.name,
+        icon: rule.icon,
+        deviceRules: rule.deviceRules
+   } 
+   rules[newRule.name] = newRule;
 }
 
 function disableRule(rule) {
@@ -89,17 +101,21 @@ function enableRule(rule) {
 };
 
 function applyRule(rule) {
-    var devices = rule.devices;
-    var brightness = rule.brightness;
+    var deviceRules = rule.deviceRules;
     var handled = false;
+    Object.keys(deviceRules).forEach(function(deviceId) {
+        var deviceRule = deviceRules[deviceId];
 
-    for(var i = 0; i < devices.length; i++) {
-        var deviceId = devices[i];
-        if(brightness) {
-            exports.dim(deviceId, brightness, 0);
+        if(deviceRule.brightness) {
+            exports.dim(deviceId, deviceRule.brightness, 0);
             handled = true;
         }
-    } 
+        if(deviceRule.state) {
+            var actionId = deviceRule.state === "on" ? 1 : 0;    
+            controlLight(deviceId, actionId);
+            handled = true;
+        }
+    });
     return handled;
 }
 
@@ -114,7 +130,7 @@ exports.rulesAsActive = function() {
         if(isActive(key)) {
             rule = rule.set('active', true);
         }
-        rule = rule.set('devices', deviceIdsToDevices(rule.get('devices')));
+        rule = rule.set('devices', rulesToDevices(rule.get('deviceRules')));
         active[key] = rule;
     });
     return active;
@@ -140,15 +156,22 @@ function isActive(ruleName) {
     return false;
 }
 
-function deviceIdsToDevices(devices) {
-    return devices.map(function(deviceId) {
-        for(var i = 0; i < endDevices.length; i++) {
-            var device = endDevices[i];
-            if(device.deviceId === deviceId) {
-                return device;
+function rulesToDevices(deviceRules) {
+    var devices = [];
+    Object.keys(deviceRules).forEach(function(deviceId) {
+        var device = filterDevice(deviceId, endDevices);
+        var deviceRule = deviceRules[deviceId];
+        if(device) {
+            if(deviceRule.enabled) {
+                device.capabilities["10006"] = deviceRule.enabled ? 1 : 0;
             }
-        }           
+            if(deviceRule.brightness) {
+                device.capabilities["10008"] = deviceRule.brightness;
+            }
+            devices.push(device);
+        }
     });
+    return devices;
 }
 
 function lightEnabled(device) {
