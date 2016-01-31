@@ -1,12 +1,13 @@
 {
-          "rules": {
-                      "theater": {
-                                    "name": "theater",
-                                          "icon": "theater.png",
-                                                "devices": [
-                                                                "94103EF6BF42ED01"
-                                                                      ],
-                                                      "brightness": 100
-                                                                  }
-          }
+    "host": {
+        "port": 3000
+    },
+    "rules": {
+        "theater": {
+            "name": "theater",
+            "icon": "theater.png",
+            "devices": [ "94103EF6BF42ED01"],
+            "brightness": 100
+        }
+    }
 }
