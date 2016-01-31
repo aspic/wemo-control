@@ -32,8 +32,11 @@ exports.endDevices = function() {
     return endDevices;
 }
 
-exports.toggle = function(deviceId, action, cb) {
-    var actionId = action === "off" ? 0 : 1;
+exports.toggle = function(deviceId, cb) {
+
+    var device = filterDevice(deviceId, endDevices);
+    var enabled = lightEnabled(device);
+    var actionId = enabled ? 0 : 1;
     
     client.setDeviceStatus(deviceId, 10006, actionId, function(err, resp) {
         exports.reload(function(devices) {
@@ -111,7 +114,6 @@ exports.rulesAsActive = function() {
         if(isActive(key)) {
             rule = rule.set('active', true);
         }
-        console.log(rule);
         rule = rule.set('devices', deviceIdsToDevices(rule.get('devices')));
         active[key] = rule;
     });
@@ -147,4 +149,9 @@ function deviceIdsToDevices(devices) {
             }
         }           
     });
+}
+
+function lightEnabled(device) {
+    return device.capabilities["10006"] === "1";
+
 }

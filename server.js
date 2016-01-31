@@ -19,11 +19,10 @@ app.get('/api/devices', function (req, res) {
     res.send(control.endDevices());
 });
 
-app.get('/api/device/:id/:toggle', function (req, res) {
+app.get('/api/device/:id/toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
-    var action = req.param("toggle");
-    control.toggle(id, action, function(device) {
+    control.toggle(id, function(device) {
         if(device) {
             res.send(device);
         } else {
