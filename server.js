@@ -45,7 +45,7 @@ app.get('/api/device/:id/level/:level', function (req, res) {
 });
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    res.send(control.rules());
+    res.send(control.allRules());
 });
 
 app.get('/api/rules/:rule/:action', function (req, res) {

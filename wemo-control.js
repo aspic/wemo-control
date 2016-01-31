@@ -7,9 +7,12 @@ var client;
 var endDevices = [];
 var rules;
 
+var activeRules = [];
+
 exports.init = function(config) {
     wemo.discover(function(deviceInfo) {
         client = wemo.client(deviceInfo);
+        console.log(client);
         exports.reload();
     });
     rules = config.rules;
@@ -67,6 +70,10 @@ exports.applyRule = function(ruleKey) {
                 handled = true;
             }
         } 
+        if(handled) {
+            activeRules.push(rule);
+        }
+
         rule.active = handled;
     }
     return rule;
@@ -74,6 +81,14 @@ exports.applyRule = function(ruleKey) {
 
 exports.rules = function() {
     return rules;
+}
+
+exports.activeRules = function() {
+    return activeRules;
+}
+
+exports.allRules = function() {
+    return {rules: rules, activeRules: activeRules};
 }
 
 function filterDevice(deviceId, devices) {

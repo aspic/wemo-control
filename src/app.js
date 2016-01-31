@@ -63,7 +63,7 @@ class NavItem extends React.Component {
 class Home extends React.Component {
     constructor() {
         super();
-        this.state = {};
+        this.state = {rules: {}, activeRules: []};
     }
 
     componentWillMount() {
@@ -75,10 +75,11 @@ class Home extends React.Component {
 
     render() {
         var available = [];
+        var rules = this.state.rules;
 
-        for(var key in this.state) {
-            if(this.state.hasOwnProperty(key)) {
-                var rule = this.state[key];
+        for(var key in rules) {
+            if(rules.hasOwnProperty(key)) {
+                var rule = rules[key];
                 available.push(<Rule key={rule.name} rule={rule} />);
             }
         }
