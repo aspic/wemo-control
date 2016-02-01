@@ -1,17 +1,18 @@
 var Promise = require('promise');
 var Immutable = require('immutable');
 
-var wemoPlugin = require('./wemo-plugin');
+var wemoPlugin = require('./plugins/wemo-plugin');
 var plugins = {};
 var rules = {};
 var activeRules = [];
-
-registerPlugin('wemo', wemoPlugin);
 
 /** exported functions */
 exports.init = function(config) {
     rules = config.rules; 
 
+    Object.keys(config.plugins).forEach(function(key) {
+        registerPlugin(key, require('./plugins/' + config.plugins[key]));
+    });
     initPlugins(); 
 }
 
@@ -99,13 +100,18 @@ exports.toggleRule = function(ruleKey) {
 
 /** helpers */
 function registerPlugin(name, plugin) {
-    plugins[name] = {
+    var enabled = {
         init: plugin.init,
         getDevices: plugin.getDevices
-    }
+    };
+
+    plugins[name] = enabled;
+    console.log("Enabled plugin: " + name);
 }
 
-function initPlugins() {
+function initPlugins(plugins) {
+    
+
     apply(function(plugin) {
         plugin.init();
     });

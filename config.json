@@ -2,15 +2,19 @@
     "host": {
         "port": 3000
     },
+    "plugins": {
+        "wemo": "wemo-plugin"
+    },
     "rules": {
         "theater": {
             "name": "theater",
             "icon": "theater.png",
-            "deviceRules": {
-                "1448121747": {
-                    "brightness": "128"
+            "devices": [
+                {
+                    "id": "1448121747",
+                    "brigthness": "128"
                 }
-            }
+            ]
         }
     }
 }
