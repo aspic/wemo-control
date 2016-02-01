@@ -14,8 +14,7 @@ app.use(bodyParser.json());
 var bridge = require('./bridge');
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-// control.init(config);
-bridge.init();
+bridge.init(config);
 
 app.use('/build', express.static('build'));
 
@@ -40,35 +39,30 @@ app.get('/api/device/:id/toggle', function (req, res) {
 app.get('/api/device/:id/brightness/:value', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
-    var level = req.param("value");
+    var value = req.param("value");
 
-    bridge.setBrightness(id, level).then(function(result) {
+    bridge.setValue(id, 'brightness', value).then(function(result) {
         res.send(result);
     }, function(err) {
         res.send({ error: err });
     });
 });
 
-/**
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    res.send(control.rulesAsActive());
+    res.send(bridge.getRules());
 });
-
 app.post('/api/rule/:rule/update', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    control.updateRule(req.body);
-    res.send(control.rulesAsActive());
+    bridge.updateRule(req.body);
+    res.send(bridge.getRules());
 });
 
 app.get('/api/rules/:rule/toggle', function (req, res) {
     var ruleKey = req.param("rule");
-    if(ruleKey) {
-        control.toggleRule(ruleKey);
-    }
-    res.send(control.rulesAsActive());
+    bridge.toggleRule(ruleKey);
+    res.send(bridge.getRules());
 });
-*/
 
 app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build/index.html'));
