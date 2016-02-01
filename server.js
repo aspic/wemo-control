@@ -1,5 +1,6 @@
 /** dependencies */
 var path = require('path');
+var Promise = require('promise');
 var express = require('express');
 var bodyParser = require("body-parser");
 var fs = require('fs');
@@ -10,10 +11,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 /** run wemo and load config */
-var control = require('./wemo-control');
+var bridge = require('./bridge');
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-control.init(config);
+// control.init(config);
+bridge.init();
 
 app.use('/build', express.static('build'));
 
@@ -23,32 +25,31 @@ app.get('/js/app.js', function (req, res) {
 
 app.get('/api/devices', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
-    res.send(control.endDevices());
+    res.send(bridge.getDevices());
 });
 
 app.get('/api/device/:id/toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
-    control.toggle(id, function(device) {
-        if(device) {
-            res.send(device);
-        } else {
-            res.send({ error: 'not found' });
-        }
+    bridge.toggle(id).then(function(result) {
+        res.send(result);
+    }, function(err) {
+        res.send({ error: err });
     });
 });
-app.get('/api/device/:id/level/:level', function (req, res) {
+app.get('/api/device/:id/brightness/:value', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
-    var level = req.param("level");
-    control.dim(id, level, 0, function(device) {
-        if(device) {
-            res.send(device);
-        } else {
-            res.send({ error: 'not found' });
-        }
+    var level = req.param("value");
+
+    bridge.setBrightness(id, level).then(function(result) {
+        res.send(result);
+    }, function(err) {
+        res.send({ error: err });
     });
 });
+
+/**
 app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send(control.rulesAsActive());
@@ -67,6 +68,7 @@ app.get('/api/rules/:rule/toggle', function (req, res) {
     }
     res.send(control.rulesAsActive());
 });
+*/
 
 app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build/index.html'));

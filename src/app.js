@@ -70,7 +70,6 @@ class Home extends React.Component {
     componentWillMount() {
         var cmp = this;
         $.ajax("/api/rules").then(function(data) {
-            console.log(data);
             cmp.setState(data);
         });
     }
@@ -136,7 +135,7 @@ class Rule extends React.Component {
         var devices = this.props.rule.devices.length;
         var cmp = this;
         var activeDevices = this.props.rule.devices.map(function(device) {
-            return <Device key={device.deviceId} device={device} valueControl={cmp.valueControl} />;
+            return <Device key={device.id} device={device} valueControl={cmp.valueControl} />;
         });
 
         return  <div>
@@ -166,7 +165,7 @@ class Devices extends React.Component {
 
     render() {
         var devices = this.state.devices.map(function(device) {
-            return <Device key={device.deviceId} device={device} />;
+            return <Device key={device.id} device={device} />;
         });
         return <div className="row col-md-12">{devices}</div>;
     }
@@ -181,15 +180,14 @@ class Device extends React.Component {
     }
     componentWillMount() {
         var device = this.props.device;
-        var enabled = device.capabilities[enabledKey]
-        if(enabled == 1) {
+        if(device.enabled) {
             this.setState({clicked: true});
         }
         this.setState({device: device});
     }
     clicked() {
         var nextState = !this.state.clicked;
-        var id = this.state.device.deviceId;
+        var id = this.state.device.id;
         var action = nextState ? "on" : "off";
 
         if(this.props.valueControl) {
@@ -204,13 +202,12 @@ class Device extends React.Component {
         $.ajax("/api/device/" + id + "/toggle").then(function(data) {
             if(data) {
                 var device = data;
-                var isEnabled = device.capabilities[enabledKey] == 1;
-                cmp.setState({clicked: isEnabled, device: device});
+                cmp.setState({clicked: device.enabled, device: device});
             }
         });
     }
     dimmed(value) {
-        var id = this.state.device.deviceId;
+        var id = this.state.device.id;
         if(this.props.valueControl) {
             this.props.valueControl(id, 'brightness', value);
         } else {
@@ -219,17 +216,17 @@ class Device extends React.Component {
     }
     dimDevice(id, value) {
         var cmp = this;
-        $.ajax("/api/device/" + id + "/level/" + value).then(function(data) {
+        $.ajax("/api/device/" + id + "/brightness/" + value).then(function(data) {
             if(data) {
-                cmp.setState({device: data});
+                cmp.setState({device: data, clicked: data.enabled});
             }
         });
     }
     render() {
-        var name = this.state.device.friendlyName;
+        var name = this.state.device.name;
         var classes = "icon-tinted" + (this.state.clicked ? " active" : "");
         var text = this.state.clicked ? "Off" : "On";
-        var dimValue = this.state.device.capabilities[dimKey].split(":")[0];
+        var dimValue = this.state.device.brightness;
         return <div className="row col-md-12 m-t-1">
                 <div className="row col-md-12">
                  <div>
