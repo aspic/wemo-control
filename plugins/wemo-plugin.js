@@ -7,6 +7,7 @@ var wemo = new Wemo();
 var client; 
 
 var LIGHT_DIMMABLE = "dimmableLight";
+var devices = [];
 
 exports.init = function() {
     console.log("Starts initiating wemo plugin");
@@ -55,4 +56,8 @@ function registerLight(device) {
             });
         }
     }
+}
+
+exports.getDevices = function() {
+    return devices;
 }

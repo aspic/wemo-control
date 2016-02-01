@@ -1,7 +1,6 @@
 var Promise = require('promise');
 var Immutable = require('immutable');
 
-var wemoPlugin = require('./plugins/wemo-plugin');
 var plugins = {};
 var rules = {};
 var activeRules = [];
