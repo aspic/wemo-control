@@ -104,21 +104,28 @@ class Rule extends React.Component {
         super();
         this.valueControl = this.valueControl.bind(this);
         this.updateRule = this.updateRule.bind(this);
-        this.state = {deviceRules: {}};
+        this.state = {devices: []};
     }
     valueControl(id, key, value) {
-        var deviceRules = this.state.deviceRules;
-        if(!deviceRules[id]) {
-            deviceRules[id] = {}
+        var devices = this.state.devices;
+        var mapped = devices.map(function(device) {
+            if(device.id === id) {
+                device[key] = value;
+                return device;
+            }
+        });
+        if(mapped.length === 0) {
+            var device = {id: id};
+            device[key] = value;
+            devices.push(device);
         }
-        deviceRules[id][key] = value;
-        this.setState({deviceRules: deviceRules});
+        this.setState({devices: devices});
         this.updateRule();
     }
     updateRule() {
         var key = this.props.rule.name;
         var rule = this.props.rule;
-        rule["deviceRules"] = this.state.deviceRules;
+        rule["devices"] = this.state.devices;
         $.ajax({
             url: "/api/rule/" + key + "/update",
             type: "POST",
@@ -134,8 +141,10 @@ class Rule extends React.Component {
         var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
         var devices = this.props.rule.devices.length;
         var cmp = this;
+        console.log(this.props.rule);
         var activeDevices = this.props.rule.devices.map(function(device) {
-            return <Device key={device.id} device={device} valueControl={cmp.valueControl} />;
+            console.log(device);
+            return <LightDevice key={device.id} device={device} valueControl={cmp.valueControl} />;
         });
 
         return  <div>
@@ -165,13 +174,15 @@ class Devices extends React.Component {
 
     render() {
         var devices = this.state.devices.map(function(device) {
-            return <Device key={device.id} device={device} />;
+            if(device.type === "light") {
+                return <LightDevice key={device.id} device={device} />;
+            }
         });
         return <div className="row col-md-12">{devices}</div>;
     }
 }
 
-class Device extends React.Component {
+class LightDevice extends React.Component {
     constructor() {
         super();
         this.state = {clicked: false, device: {}};
@@ -191,13 +202,13 @@ class Device extends React.Component {
         var action = nextState ? "on" : "off";
 
         if(this.props.valueControl) {
-            this.props.valueControl(id, 'state', action);
+            this.props.valueControl(id, 'enabled', nextState);
             this.setState({clicked: nextState});
         } else {
-            this.toggleDevice(id, action);
+            this.toggle(id, action);
         }
     }
-    toggleDevice(id, action) {
+    toggle(id, action) {
         var cmp = this;
         $.ajax("/api/device/" + id + "/toggle").then(function(data) {
             if(data) {
@@ -211,10 +222,10 @@ class Device extends React.Component {
         if(this.props.valueControl) {
             this.props.valueControl(id, 'brightness', value);
         } else {
-            this.dimDevice(id, value);
+            this.dim(id, value);
         }
     }
-    dimDevice(id, value) {
+    dim(id, value) {
         var cmp = this;
         $.ajax("/api/device/" + id + "/brightness/" + value).then(function(data) {
             if(data) {
