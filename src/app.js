@@ -165,6 +165,12 @@ class Rule extends React.Component {
             return <LightDevice key={device.id} device={device} valueControl={cmp.valueControl} />;
         });
 
+        var availableDevices = this.props.devices.filter(function(device) {
+            return !devices.some(function(device2) {
+                return device.id == device2.id;
+            });
+        });
+
         return  <div className="col-md-12">
                  <div className="col-md-12">
                   <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}> <i className={toggle}></i> </a>
@@ -177,7 +183,7 @@ class Rule extends React.Component {
                   </div>
                  </div>
                  <div className="col-md-6">
-                  <DeviceDropdown devices={this.props.devices} addDevice={this.addDevice}/>
+                  <DeviceDropdown devices={availableDevices} addDevice={this.addDevice}/>
                  </div>
                 </div>
     }
@@ -267,15 +273,23 @@ class LightDevice extends React.Component {
 }
 
 class DeviceDropdown extends React.Component {
+    constructor() {
+        super();
+        this.open = this.open.bind(this);
+        this.state = {open: false};
+    }
+    open() {
+        this.setState({open: !this.state.open});
+    }
     render() {
         var cmp = this;
         var devices = this.props.devices.map(function(device) {
             var deviceInfo = {id: device.id, name: device.name, type: device.type};
             return <a className="dropdown-item" onClick={cmp.props.addDevice.bind(cmp, deviceInfo)}>{device.name}</a>
         });
-
-        return  <div className="dropdown open"> 
-                 <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        var classes = "dropdown" + (this.state.open ? " open" : "");
+        return  <div className={classes}> 
+                 <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" onClick={this.open}>
                   Devices
                  </button>
                  <div className="dropdown-menu" aria-labelledby="dropdownMenu2">
