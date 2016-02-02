@@ -37,19 +37,6 @@ exports.toggle = function(id) {
     });
 }
 
-exports.setBrightness = function(id, value) {
-    return new Promise(function(resolve, reject) {
-        var device = getDevice(id);
-        if(device && device.setBrightness) {
-            device.setBrightness(value, function() {
-                resolve(device);
-            });
-        } else {
-            reject("device " + id + " does not support setBrightness");
-        }
-    });
-}
-
 exports.setValue = function(id, key, value) {
     return new Promise(function(resolve, reject) {
         var device = getDevice(id);
