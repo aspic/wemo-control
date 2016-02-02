@@ -208,21 +208,21 @@ class Rule extends React.Component {
             availableDevices = this.props.devices;
         }
         var detailClasses = (!this.state.edit ? "hidden" : "");
-        var dropdownClasses = (!availableDevices || availableDevices.length == 0) ? "hidden" : "col-md-6";
+        var dropdownClasses = (!availableDevices || availableDevices.length == 0) ? "hidden" : "col-md-6 col-xs-12";
         
         return  <div>
                  <div className="col-md-12">
-                  <div className="col-md-6">
+                  <div className="col-md-6 col-xs-10">
                   <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}> <i className={toggle}></i> </a>
                   {this.state.rule.name} ({devicesLength} device(s))
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-6 col-xs-2">
                    <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}></i></a>
                    <a><i className="fa fa-times -o fa-lg" onClick={this.remove}></i></a>
                   </div>
                  </div>
                  <div className={detailClasses}>
-                  <div className="col-md-6">
+                  <div className="col-md-6 col-xs-10">
                   <div className="form-group">
                    <input type="text" name="name" className="form-control" defaultValue={this.state.name} onChange={this.setName}></input>
                    {activeDevices}
