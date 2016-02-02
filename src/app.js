@@ -1,7 +1,7 @@
 var enabledKey = "10006";
 var dimKey = "10008";
 
-var menu = ["devices", "rules"];
+var menu = ["modes", "devices"];
 
 class Container extends React.Component {
     constructor() {
@@ -24,7 +24,7 @@ class Container extends React.Component {
         // TODO: map to components
         if(chosen === "devices") {
             section = <Devices devices={this.state.devices}/>
-        } else if(chosen === "rules") {
+        } else if(chosen === "modes") {
             section = <Home devices={this.state.devices}/>
         }
         return <div className="container">
@@ -76,7 +76,6 @@ class Home extends React.Component {
     componentWillMount() {
         var cmp = this;
         $.ajax("/api/rules").then(function(rules) {
-            console.log(rules);
             cmp.setState({rules: rules});
         });
     }
