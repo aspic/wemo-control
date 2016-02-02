@@ -69,8 +69,9 @@ class NavItem extends React.Component {
 class Home extends React.Component {
     constructor() {
         super();
-        this.state = {rules: []};
         this.toggleRule = this.toggleRule.bind(this);
+        this.add = this.add.bind(this);
+        this.state = {rules: []};
     }
 
     componentWillMount() {
@@ -87,15 +88,30 @@ class Home extends React.Component {
         });
     }
 
+    add() {
+        var rules = this.state.rules;
+        var newRule = {id: -1};
+        rules.push(newRule);
+        this.setState({rules: rules});
+    }
+
     render() {
         var rules = this.state.rules;
         var cmp = this;
+        var i = 0;
 
         var available = rules.map(function(rule) {
-            return <Rule key={rule.id} rule={rule} toggleRule={cmp.toggleRule} devices={cmp.props.devices}/>;
+            i++;
+            return <Rule key={i} rule={rule} toggleRule={cmp.toggleRule} devices={cmp.props.devices}/>;
         });
         return  <div className="row col-md-12">
-                 <h3>Configured rules</h3> 
+                 <div className="col-md-6">
+                  <h3>Configured rules</h3> 
+                 </div>
+                 <div className="col-md-6">
+                  <a onClick={this.add}><i className="fa fa-plus fa-lg"></i></a>
+                 </div>
+                
                  {available}
                 </div>;
     }
@@ -108,7 +124,9 @@ class Rule extends React.Component {
         this.updateRule = this.updateRule.bind(this);
         this.addDevice = this.addDevice.bind(this);
         this.setName = this.setName.bind(this);
-        this.state = {rule: {devices: []}};
+        this.edit = this.edit.bind(this);
+        this.remove = this.remove.bind(this);
+        this.state = {rule: {devices: []}, edit: false};
     }
     componentWillMount() {
         this.setState({rule: this.props.rule, name: this.props.rule.name});
@@ -121,8 +139,20 @@ class Rule extends React.Component {
     }
     addDevice(device) {
         var rule = this.state.rule;
+        if(!rule.devices) {
+            rule.devices = [];
+        }
         rule.devices.push(device);
         this.setState({rule: rule});
+    }
+    edit() {
+        this.setState({edit: !this.state.edit});
+    }
+    remove() {
+        var rule = this.state.rule;
+        rule.removed = true;
+        this.setState({rule: rule});
+        this.updateRule();
     }
     valueControl(id, key, value) {
         var rule = this.state.rule;
@@ -142,6 +172,7 @@ class Rule extends React.Component {
         this.updateRule();
     }
     updateRule() {
+        var cmp = this;
         var rule = this.state.rule;
         var id = rule.id;
         rule["devices"] = rule.devices;
@@ -150,8 +181,8 @@ class Rule extends React.Component {
             type: "POST",
             dataType: "json",
             contentType: "application/json",
-            success: function (data) {
-                console.log(data);
+            success: function (rule) {
+                cmp.setState({rule: rule, name: rule.name});
             },
             data: JSON.stringify(rule)
         });
@@ -160,30 +191,47 @@ class Rule extends React.Component {
         var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
         var devices = this.state.rule.devices;
         var cmp = this;
-        var activeDevices = devices.map(function(device) {
-            return <LightDevice key={device.id} device={device} valueControl={cmp.valueControl} />;
-        });
-
-        var availableDevices = this.props.devices.filter(function(device) {
-            return !devices.some(function(device2) {
-                return device.id == device2.id;
+        var activeDevices; 
+        var availableDevices; 
+        var devicesLength = 0;
+        if(devices) {
+            activeDevices = devices.map(function(device) {
+                return <LightDevice key={device.id} device={device} valueControl={cmp.valueControl} />;
             });
-        });
-
-        return  <div className="col-md-12">
+            availableDevices = this.props.devices.filter(function(device) {
+                return !devices.some(function(device2) {
+                    return device.id == device2.id;
+                });
+            });
+            devicesLength = activeDevices.length;
+        } else {
+            availableDevices = this.props.devices;
+        }
+        var detailClasses = (!this.state.edit ? "hidden" : "");
+        var dropdownClasses = (!availableDevices || availableDevices.length == 0) ? "hidden" : "col-md-6";
+        
+        return  <div>
                  <div className="col-md-12">
+                  <div className="col-md-6">
                   <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}> <i className={toggle}></i> </a>
-                  {this.props.rule.name} ({devices.length} device(s))
+                  {this.state.rule.name} ({devicesLength} device(s))
+                  </div>
+                  <div className="col-md-6">
+                   <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}></i></a>
+                   <a><i className="fa fa-times -o fa-lg" onClick={this.remove}></i></a>
+                  </div>
                  </div>
-                 <div className="col-md-6">
+                 <div className={detailClasses}>
+                  <div className="col-md-6">
                   <div className="form-group">
                    <input type="text" name="name" className="form-control" defaultValue={this.state.name} onChange={this.setName}></input>
                    {activeDevices}
                   </div>
                  </div>
-                 <div className="col-md-6">
+                 <div className={dropdownClasses}>
                   <DeviceDropdown devices={availableDevices} addDevice={this.addDevice}/>
                  </div>
+                </div>
                 </div>
     }
 }

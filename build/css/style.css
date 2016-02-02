@@ -13,3 +13,7 @@
 .icon-tinted.active i {
 	color: rgb(255, 201, 14);
 }
+
+.hidden {
+	display: none;
+}

@@ -69,7 +69,12 @@ exports.getRules = function() {
     return active;
 }
 
-exports.updateRule = function(rule) {
+exports.updateRule = function(rule, id) {
+    if(rule.removed) {
+        rules.slice(rule.id, 1);
+        return rule;
+    }
+
    var newRule = {
         id: rule.id,
         name: rule.name,
@@ -78,9 +83,14 @@ exports.updateRule = function(rule) {
    } 
    if(rule.id >= rules.length) {
         rules.push(newRule);
+   } else if(id < 0) {
+        var id = rules.length;
+        newRule.id = id;
+        rules.push(newRule);
    } else {
         rules[rule.id] = newRule;
    }
+   return newRule;
 }
 
 exports.toggleRule = function(ruleId) {

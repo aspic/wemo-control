@@ -52,10 +52,11 @@ app.get('/api/rules/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send(bridge.getRules());
 });
-app.post('/api/rule/:rule/update', function(req, res) {
+app.post('/api/rule/:id/update', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    bridge.updateRule(req.body);
-    res.send(bridge.getRules());
+    var id = req.param("id");
+    var rule = bridge.updateRule(req.body, id);
+    res.send(rule);
 });
 
 app.get('/api/rules/:id/toggle', function (req, res) {
