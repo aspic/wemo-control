@@ -6,20 +6,26 @@ var menu = ["devices", "rules"];
 class Container extends React.Component {
     constructor() {
         super();
-        this.state = {section: menu[0]};
+        this.state = {section: menu[0], devices: []};
         this.sectionChooser = this.sectionChooser.bind(this);
     }
     sectionChooser(section) {
         this.setState({section: section});
+    }
+    componentWillMount() {
+        var cmp = this;
+        $.ajax("/api/devices").then(function(data) {
+            cmp.setState({devices: data});
+        });
     }
     render() {
         var chosen = this.state.section;
         var section;
         // TODO: map to components
         if(chosen === "devices") {
-            section = <Devices />
+            section = <Devices devices={this.state.devices}/>
         } else if(chosen === "rules") {
-            section = <Home />
+            section = <Home devices={this.state.devices}/>
         }
         return <div className="container">
                 <Navbar menuSelect={this.sectionChooser} section={this.state.section}/>
@@ -63,35 +69,32 @@ class NavItem extends React.Component {
 class Home extends React.Component {
     constructor() {
         super();
-        this.state = {};
+        this.state = {rules: []};
         this.toggleRule = this.toggleRule.bind(this);
     }
 
     componentWillMount() {
         var cmp = this;
-        $.ajax("/api/rules").then(function(data) {
-            cmp.setState(data);
+        $.ajax("/api/rules").then(function(rules) {
+            console.log(rules);
+            cmp.setState({rules: rules});
         });
     }
 
-    toggleRule(ruleName) {
+    toggleRule(id) {
         var cmp = this;
-        $.ajax("/api/rules/" + ruleName + "/toggle").then(function(data) {
-            cmp.setState(data);
+        $.ajax("/api/rules/" + id + "/toggle").then(function(rules) {
+            cmp.setState({rules: rules});
         });
     }
 
     render() {
-        var available = [];
-        var rules = this.state;
+        var rules = this.state.rules;
         var cmp = this;
 
-        for(var key in rules) {
-            if(rules.hasOwnProperty(key)) {
-                var rule = rules[key];
-                available.push(<Rule key={rule.name} rule={rule} toggleRule={this.toggleRule}/>);
-            }
-        }
+        var available = rules.map(function(rule) {
+            return <Rule key={rule.id} rule={rule} toggleRule={cmp.toggleRule} devices={cmp.props.devices}/>;
+        });
         return  <div className="row col-md-12">
                  <h3>Configured rules</h3> 
                  {available}
@@ -104,10 +107,27 @@ class Rule extends React.Component {
         super();
         this.valueControl = this.valueControl.bind(this);
         this.updateRule = this.updateRule.bind(this);
-        this.state = {devices: []};
+        this.addDevice = this.addDevice.bind(this);
+        this.setName = this.setName.bind(this);
+        this.state = {rule: {devices: []}};
+    }
+    componentWillMount() {
+        this.setState({rule: this.props.rule});
+    }
+    setName(event) {
+        var rule = this.state.rule;
+        rule.name = event.target.value;
+        this.setState({rule: rule});
+        this.updateRule();
+    }
+    addDevice(device) {
+        var rule = this.state.rule;
+        rule.devices.push(device);
+        this.setState({rule: rule});
     }
     valueControl(id, key, value) {
-        var devices = this.state.devices;
+        var rule = this.state.rule;
+        var devices = rule.devices;
         var mapped = devices.map(function(device) {
             if(device.id === id) {
                 device[key] = value;
@@ -119,15 +139,15 @@ class Rule extends React.Component {
             device[key] = value;
             devices.push(device);
         }
-        this.setState({devices: devices});
+        this.setState({rule: rule});
         this.updateRule();
     }
     updateRule() {
-        var key = this.props.rule.name;
-        var rule = this.props.rule;
-        rule["devices"] = this.state.devices;
+        var rule = this.state.rule;
+        var id = rule.id;
+        rule["devices"] = rule.devices;
         $.ajax({
-            url: "/api/rule/" + key + "/update",
+            url: "/api/rule/" + id + "/update",
             type: "POST",
             dataType: "json",
             contentType: "application/json",
@@ -139,20 +159,25 @@ class Rule extends React.Component {
     }
     render() {
         var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
-        var devices = this.props.rule.devices.length;
+        var devices = this.state.rule.devices;
         var cmp = this;
-        console.log(this.props.rule);
-        var activeDevices = this.props.rule.devices.map(function(device) {
-            console.log(device);
+        var activeDevices = devices.map(function(device) {
             return <LightDevice key={device.id} device={device} valueControl={cmp.valueControl} />;
         });
 
-        return  <div>
-                 <a onClick={this.props.toggleRule.bind(this, this.props.rule.name)}> <i className={toggle}></i> </a>
-                 {this.props.rule.name} ({devices} device(s))
-                 <div className="form-group">
-                  <input type="text" name="name" className="form-control" defaultValue={this.props.rule.name}></input>
-                  {activeDevices}
+        return  <div className="col-md-12">
+                 <div className="col-md-12">
+                  <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}> <i className={toggle}></i> </a>
+                  {this.props.rule.name} ({devices.length} device(s))
+                 </div>
+                 <div className="col-md-6">
+                  <div className="form-group">
+                   <input type="text" name="name" className="form-control" defaultValue={this.state.name} onChange={this.setName}></input>
+                   {activeDevices}
+                  </div>
+                 </div>
+                 <div className="col-md-6">
+                  <DeviceDropdown devices={this.props.devices} addDevice={this.addDevice}/>
                  </div>
                 </div>
     }
@@ -160,20 +185,8 @@ class Rule extends React.Component {
 
 class Devices extends React.Component {
 
-    constructor() {
-        super();
-        this.state = {devices: []};
-    }
-
-    componentWillMount() {
-        var cmp = this;
-        $.ajax("/api/devices").then(function(data) {
-            cmp.setState({devices: data});
-        });
-    }
-
     render() {
-        var devices = this.state.devices.map(function(device) {
+        var devices = this.props.devices.map(function(device) {
             if(device.type === "light") {
                 return <LightDevice key={device.id} device={device} />;
             }
@@ -250,6 +263,25 @@ class LightDevice extends React.Component {
                  </div>
                 </div>
             </div>;
+    }
+}
+
+class DeviceDropdown extends React.Component {
+    render() {
+        var cmp = this;
+        var devices = this.props.devices.map(function(device) {
+            var deviceInfo = {id: device.id, name: device.name, type: device.type};
+            return <a className="dropdown-item" onClick={cmp.props.addDevice.bind(cmp, deviceInfo)}>{device.name}</a>
+        });
+
+        return  <div className="dropdown open"> 
+                 <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Devices
+                 </button>
+                 <div className="dropdown-menu" aria-labelledby="dropdownMenu2">
+                  {devices}
+                 </div>
+                </div>;
     }
 }
 
