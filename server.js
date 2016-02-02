@@ -58,9 +58,9 @@ app.post('/api/rule/:rule/update', function(req, res) {
     res.send(bridge.getRules());
 });
 
-app.get('/api/rules/:rule/toggle', function (req, res) {
-    var ruleKey = req.param("rule");
-    bridge.toggleRule(ruleKey);
+app.get('/api/rules/:id/toggle', function (req, res) {
+    var id = req.param("id");
+    bridge.toggleRule(id);
     res.send(bridge.getRules());
 });
 

@@ -5,16 +5,12 @@
     "plugins": {
         "wemo": "wemo-plugin"
     },
-    "rules": {
-        "theater": {
+    "rules": [
+        {
             "name": "theater",
             "icon": "theater.png",
             "devices": [
-                {
-                    "id": "1448121747",
-                    "brigthness": "128"
-                }
             ]
         }
-    }
+    ]
 }
