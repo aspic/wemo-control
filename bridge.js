@@ -2,7 +2,7 @@ var Promise = require('promise');
 var Immutable = require('immutable');
 
 var plugins = {};
-var rules = {};
+var rules = [];
 var activeRules = [];
 
 /** exported functions */
@@ -57,6 +57,7 @@ exports.setValue = function(id, key, value) {
             reject("device with id: " + id + " not found");
         }
         var setter = toSetter(key);
+        console.log(setter);
         if(device && typeof(device[setter]) === 'function') {
             device[setter](value, function() {
                 resolve(device);
@@ -68,31 +69,37 @@ exports.setValue = function(id, key, value) {
 }
 
 exports.getRules = function() {
-    var active = {};
-    Object.keys(rules).forEach(function(key) {
-        var rule = Immutable.Map(rules[key])
-        if(isActive(key)) {
+    var i = 0;
+    var active = rules.map(function(rule) {
+        var rule = Immutable.Map(rule)
+        if(isActive(i)) {
             rule = rule.set('active', true);
         }
-        active[key] = rule;
+        rule = rule.set('id', i);
+        i++;
+        return rule;
     });
     return active;
 }
 
 exports.updateRule = function(rule) {
    var newRule = {
+        id: rule.id,
         name: rule.name,
         icon: rule.icon,
         devices: rule.devices
    } 
-   rules[newRule.name] = newRule;
-   console.log(rules);
+   if(rule.id >= rules.length) {
+        rules.push(newRule);
+   } else {
+        rules[rule.id] = newRule;
+   }
 }
 
-exports.toggleRule = function(ruleKey) {
-    var rule = rules[ruleKey];
+exports.toggleRule = function(ruleId) {
+    var rule = rules[ruleId];
     if(rule) {
-        isActive(ruleKey) ? disableRule(rule) : enableRule(rule);
+        isActive(ruleId) ? disableRule(rule) : enableRule(rule);
     }
     return exports.getRules();
 }
@@ -137,9 +144,9 @@ function toSetter(key) {
     return "set" + key.charAt(0).toUpperCase() + key.slice(1);
 }
 
-function isActive(ruleName) {
+function isActive(id) {
     for(var i = 0; i < activeRules.length; i++) {
-        if(activeRules[i].name === ruleName) {
+        if(activeRules[i].id == id) {
             return true;
         } 
     }
@@ -149,7 +156,7 @@ function isActive(ruleName) {
 function disableRule(rule) {
     for(var i = 0; i < activeRules.length; i++) {
         var activeRule = activeRules[i];
-        if(rule.name === activeRule.name) {
+        if(rule.id == activeRule.id) {
             activeRules.splice(i, 1);
             break;
         }
