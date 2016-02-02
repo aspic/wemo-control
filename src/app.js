@@ -112,7 +112,7 @@ class Rule extends React.Component {
         this.state = {rule: {devices: []}};
     }
     componentWillMount() {
-        this.setState({rule: this.props.rule});
+        this.setState({rule: this.props.rule, name: this.props.rule.name});
     }
     setName(event) {
         var rule = this.state.rule;
