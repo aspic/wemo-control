@@ -272,8 +272,9 @@ class LightDevice extends React.Component {
     }
     clicked() {
         var nextState = !this.state.clicked;
+        var id = this.state.device.id;
         if(this.props.valueControl) {
-            this.props.valueControl(this.state.device.id, 'enabled', nextState);
+            this.props.valueControl(id, 'enabled', nextState);
             this.setState({clicked: nextState});
         } else {
             this.toggle(id);
@@ -281,7 +282,8 @@ class LightDevice extends React.Component {
     }
     toggle() {
         var cmp = this;
-        $.ajax("/api/device/" + this.state.device.id + "/toggle").then(function(data) {
+        var id = this.state.device.id;
+        $.ajax("/api/device/" + id + "/toggle").then(function(data) {
             if(data) {
                 var device = data;
                 cmp.setState({clicked: device.enabled, device: device});
