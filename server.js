@@ -30,22 +30,24 @@ app.get('/api/devices', function (req, res) {
 app.get('/api/device/:id/toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
-    bridge.toggle(id).then(function(result) {
-        res.send(result);
-    }, function(err) {
-        res.send({ error: err });
-    });
+    bridge.toggle(id)
+        .then(function(result) {
+            res.send(result);
+        }, function(err) {
+            res.send({ error: err });
+        });
 });
 app.get('/api/device/:id/brightness/:value', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
     var value = req.param("value");
 
-    bridge.setValue(id, 'brightness', value).then(function(result) {
-        res.send(result);
-    }, function(err) {
-        res.send({ error: err });
-    });
+    bridge.setValue(id, 'brightness', value)
+        .then(function(result) {
+            res.send(result);
+        }, function(err) {
+            res.send({ error: err });
+        });
 });
 
 app.get('/api/rules/', function(req, res) {
@@ -56,6 +58,12 @@ app.post('/api/rule/:id/update', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.param("id");
     var rule = bridge.updateRule(req.body, id);
+    storeConfig()
+        .then(function(result) {
+            console.log(result);
+        }, function(err) {
+            console.log(err);
+        });
     res.send(rule);
 });
 
@@ -68,6 +76,22 @@ app.get('/api/rules/:id/toggle', function (req, res) {
 app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build/index.html'));
 });
+
+function storeConfig() {
+    return new Promise(function(resolve, reject) {
+        var rules = bridge.getRules();
+        config.rules = rules;
+        var configString = JSON.stringify(config, null, 4);
+
+        fs.writeFile("./config.json", configString, function(err) {
+            if(err) {
+                reject("Unable to write config: " + err);
+            } else {
+                resolve("Config written");
+            }
+        });  
+    });
+}
 
 var port = 8080;
 if(config.host) {
