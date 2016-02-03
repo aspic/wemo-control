@@ -104,15 +104,13 @@ class Home extends React.Component {
             i++;
             return <Rule key={i} rule={rule} toggleRule={cmp.toggleRule} devices={cmp.props.devices}/>;
         });
-        return  <div className="row col-md-12">
+        return  <div className="col-md-12 m-t-2">
                  <div className="col-md-6 col-xs-10">
-                  <h3>Configured rules</h3> 
+                  <a onClick={this.add}><i className="fa fa-plus fa-lg"></i></a>
+                  {available}
                  </div>
                  <div className="col-md-6 col-xs-2">
-                  <a onClick={this.add}><i className="fa fa-plus fa-lg"></i></a>
                  </div>
-                
-                 {available}
                 </div>;
     }
 }
@@ -208,23 +206,25 @@ class Rule extends React.Component {
             availableDevices = this.props.devices;
         }
         var detailClasses = (!this.state.edit ? "hidden" : "");
-        var dropdownClasses = (!availableDevices || availableDevices.length == 0) ? "hidden" : "col-md-6 col-xs-12";
+        var dropdownClasses = (!availableDevices || availableDevices.length == 0) ? "hidden" : "col-md-2 col-xs-12";
+        var name = <span>{this.state.rule.name} ({devicesLength})</span>
+        if(this.state.edit) {
+            name = <input type="text" name="name" className="form-control" defaultValue={this.state.name} onChange={this.setName}></input>
+        }
         
         return  <div>
-                 <div className="col-md-12">
-                  <div className="col-md-6 col-xs-10">
-                  <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}><i className={toggle}></i></a>
-                  <span> </span>{this.state.rule.name} ({devicesLength} device(s))
+                 <div className="row m-t-2">
+                  <div className="col-md-10 col-xs-10 form-inline">
+                   <h4><a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}><i className={toggle}></i></a> {name} </h4>
                   </div>
-                  <div className="col-md-6 col-xs-2">
+                  <div className="col-md-2 col-xs-2">
                    <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}></i></a>
-                   <a><i className="fa fa-times -o fa-lg" onClick={this.remove}></i></a>
+                   <a className="pull-right"><i className="fa fa-times -o fa-lg" onClick={this.remove}></i></a>
                   </div>
                  </div>
                  <div className={detailClasses}>
-                  <div className="col-md-6 col-xs-10">
+                  <div className="col-md-10 col-xs-10">
                   <div className="form-group">
-                   <input type="text" name="name" className="form-control" defaultValue={this.state.name} onChange={this.setName}></input>
                    {activeDevices}
                   </div>
                  </div>
@@ -272,9 +272,8 @@ class LightDevice extends React.Component {
     }
     clicked() {
         var nextState = !this.state.clicked;
-
         if(this.props.valueControl) {
-            this.props.valueControl(id, 'enabled', nextState);
+            this.props.valueControl(this.state.device.id, 'enabled', nextState);
             this.setState({clicked: nextState});
         } else {
             this.toggle(id);
@@ -282,8 +281,7 @@ class LightDevice extends React.Component {
     }
     toggle() {
         var cmp = this;
-        var id = this.state.device.id;
-        $.ajax("/api/device/" + id + "/toggle").then(function(data) {
+        $.ajax("/api/device/" + this.state.device.id + "/toggle").then(function(data) {
             if(data) {
                 var device = data;
                 cmp.setState({clicked: device.enabled, device: device});
