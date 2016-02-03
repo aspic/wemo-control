@@ -244,7 +244,15 @@ class Devices extends React.Component {
                 return <LightDevice key={device.id} device={device} />;
             }
         });
-        return <div className="row col-md-12">{devices}</div>;
+        return <div className="m-t-2">
+                <div className="col-md-6 col-xs-12">{devices}</div>
+                <div className="col-md-6 col-xs-12">
+                 <div className="card card-block">
+                  <h4 className="card-title">Devices</h4>
+                  <p className="card-text">These are all devices discovered on your network. These devices are directly controllable.</p>
+                 </div> 
+                </div>
+               </div>
     }
 }
 
@@ -264,18 +272,17 @@ class LightDevice extends React.Component {
     }
     clicked() {
         var nextState = !this.state.clicked;
-        var id = this.state.device.id;
-        var action = nextState ? "on" : "off";
 
         if(this.props.valueControl) {
             this.props.valueControl(id, 'enabled', nextState);
             this.setState({clicked: nextState});
         } else {
-            this.toggle(id, action);
+            this.toggle(id);
         }
     }
-    toggle(id, action) {
+    toggle() {
         var cmp = this;
+        var id = this.state.device.id;
         $.ajax("/api/device/" + id + "/toggle").then(function(data) {
             if(data) {
                 var device = data;
@@ -304,18 +311,12 @@ class LightDevice extends React.Component {
         var classes = "icon-tinted" + (this.state.clicked ? " active" : "");
         var text = this.state.clicked ? "Off" : "On";
         var dimValue = this.state.device.brightness;
-        return <div className="row col-md-12 m-t-1">
-                <div className="row col-md-12">
-                 <div>
-                  <h4>
-                   <a className={classes} onClick={this.clicked}><i className="fa fa-lightbulb-o fa-lg"></i></a> {name}
-                  </h4>
-                 </div>
-                 <div>
-                  <Slider value={dimValue} dimmer={this.dimmed} />
-                 </div>
-                </div>
-            </div>;
+        return <div className="m-t-1">
+                <h4>
+                 <a className={classes} onClick={this.clicked}><i className="fa fa-lightbulb-o fa-lg"></i></a> {name}
+                 <Slider value={dimValue} dimmer={this.dimmed} />
+                </h4>
+               </div>;
     }
 }
 
@@ -355,7 +356,7 @@ class Slider extends React.Component {
         this.props.dimmer(event.target.value);
     }
     render() {
-        return <div>0 <input type="range" min="0" max="255" defaultValue={this.props.value} onMouseUp={this.onChange} onTouchEnd={this.onChange}></input> 100</div>
+        return <input type="range" min="0" max="255" defaultValue={this.props.value} onMouseUp={this.onChange} onTouchEnd={this.onChange}></input>
     }
 }
 
