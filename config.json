@@ -7,10 +7,22 @@
     },
     "rules": [
         {
-            "name": "theater",
-            "icon": "theater.png",
+            "id": 0,
+            "name": "theaterdd",
             "devices": [
-            ]
+                {
+                    "id": "94103EF6BF42ED01",
+                    "name": "Leselys ",
+                    "type": "light",
+                    "brightness": "67",
+                    "enabled": true
+                }
+            ],
+            "active": true
+        },
+        {
+            "id": 1,
+            "name": "Test device"
         }
     ]
 }

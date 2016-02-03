@@ -105,10 +105,10 @@ class Home extends React.Component {
             return <Rule key={i} rule={rule} toggleRule={cmp.toggleRule} devices={cmp.props.devices}/>;
         });
         return  <div className="row col-md-12">
-                 <div className="col-md-6">
+                 <div className="col-md-6 col-xs-10">
                   <h3>Configured rules</h3> 
                  </div>
-                 <div className="col-md-6">
+                 <div className="col-md-6 col-xs-2">
                   <a onClick={this.add}><i className="fa fa-plus fa-lg"></i></a>
                  </div>
                 
@@ -213,8 +213,8 @@ class Rule extends React.Component {
         return  <div>
                  <div className="col-md-12">
                   <div className="col-md-6 col-xs-10">
-                  <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}> <i className={toggle}></i> </a>
-                  {this.state.rule.name} ({devicesLength} device(s))
+                  <a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}><i className={toggle}></i></a>
+                  <span> </span>{this.state.rule.name} ({devicesLength} device(s))
                   </div>
                   <div className="col-md-6 col-xs-2">
                    <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}></i></a>
