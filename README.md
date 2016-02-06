@@ -19,7 +19,30 @@ I got my hands on a couple of [wemo lights](http://www.belkin.com/us/p/P-F7C033/
 
 This starts the server and exposes the web application on ```http://localhost:3000```
 
+### Plugins
+
+Check the [plugins folder](https://github.com/aspic/wemo-control/tree/master/plugins) for available plugins. This web app currently only supports wemo lights. It should be easy to extend this web app with other systems (phillips hue for instance) as long as there is a node plugin for that system. A primitive plugin only needs to detect devices and update their state. Se below for a small example:
+
+```
+/** client setup code goes here */
+..
+var devices = [];
+
+/** Init gets triggered by bridge.js, discovers devices and creates device bridge objects */ 
+exports.init = function() {
+    /**
+     * Sets up devices, look at wemo-plugin.js for an example.
+     * If a light is to be enabled/disabled, a setEnabled function needs to be defined 
+     */
+};
+
+// Returns all configured devices
+exports.getDevices = function() {
+    return devices;
+}
+```
+
 ## Todo
-* Add a 'mode' section, where it's possible to create modes and control multiple bulbs at once (and by certain rules)
+* Flexible way to control rules
 * Extract frontend-stuff into a distable dependency
 * Periodically controllable modes, for instance turn all lights on at 0700am
