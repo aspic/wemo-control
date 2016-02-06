@@ -36,7 +36,7 @@ exports.init = function() {
      */
 };
 
-// Returns all configured devices
+/** Returns all configured devices */
 exports.getDevices = function() {
     return devices;
 }
