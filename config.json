@@ -19,10 +19,6 @@
                 }
             ],
             "active": true
-        },
-        {
-            "id": 1,
-            "name": "Test device"
         }
     ]
 }
