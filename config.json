@@ -8,7 +8,7 @@
     "rules": [
         {
             "id": 0,
-            "name": "theaterdd",
+            "name": "Movie time",
             "devices": [
                 {
                     "id": "94103EF6BF42ED01",
