@@ -67,10 +67,15 @@ app.post('/api/rule/:id/update', function(req, res) {
     res.send(rule);
 });
 
-app.get('/api/rules/:id/toggle', function (req, res) {
-    var id = req.param("id");
-    bridge.toggleRule(id);
-    res.send(bridge.getRules());
+app.get('/api/rule/:name/:action', function (req, res) {
+    var name = req.param("name");
+    var action = req.param("action");
+    bridge.controlRule(name, action)
+        .then(function(rule) {
+            res.send(rule);
+        }, function(err) {
+            res.status(404).send(err);
+        });
 });
 
 app.get('*', function (req, res) {

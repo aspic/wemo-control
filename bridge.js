@@ -58,10 +58,7 @@ exports.setValue = function(id, key, value) {
 exports.getRules = function() {
     var i = 0;
     var active = rules.map(function(rule) {
-        var rule = Immutable.Map(rule)
-        if(isActive(i)) {
-            rule = rule.set('active', true);
-        }
+        var rule = copyRule(rule);
         rule = rule.set('id', i);
         i++;
         return rule;
@@ -69,6 +66,7 @@ exports.getRules = function() {
     return active;
 }
 
+/** Adds or updates a rule */
 exports.updateRule = function(rule, id) {
     if(rule.removed) {
         rules.slice(rule.id, 1);
@@ -93,12 +91,24 @@ exports.updateRule = function(rule, id) {
    return newRule;
 }
 
-exports.toggleRule = function(ruleId) {
-    var rule = rules[ruleId];
-    if(rule) {
-        isActive(ruleId) ? disableRule(rule) : enableRule(rule);
-    }
-    return exports.getRules();
+/* Disables, enables or toggles rule by name */
+exports.controlRule = function(name, action) {
+    return new Promise(function(resolve, reject) {
+        var rule = ruleByName(name);
+        if (rule) {
+            if(action == "toggle") {
+                resolve(isActive(rule) ? disableRule(rule) : enableRule(rule));
+            } else if(action == "enable") {
+                resolve(enableRule(rule));
+            } else if(action == "disable") {
+                resolve(disableRule(rule));
+            } else {
+                reject("action " + action + " not supported");
+            }
+        } else {
+            reject("unable to find rule: " + name);
+        }
+    });
 }
 
 /** helpers */
@@ -113,8 +123,6 @@ function registerPlugin(name, plugin) {
 }
 
 function initPlugins(plugins) {
-    
-
     apply(function(plugin) {
         plugin.init();
     });
@@ -141,9 +149,9 @@ function toSetter(key) {
     return "set" + key.charAt(0).toUpperCase() + key.slice(1);
 }
 
-function isActive(id) {
+function isActive(rule) {
     for(var i = 0; i < activeRules.length; i++) {
-        if(activeRules[i].id == id) {
+        if(activeRules[i].id == rule.id) {
             return true;
         } 
     }
@@ -162,12 +170,20 @@ function disableRule(rule) {
     if(activeRules.length > 0) {
         applyRule(activeRules[activeRules.length - 1]);
     }
+    return copyRule(rule);
+}
+
+function copyRule(rule) {
+    var copy = Immutable.Map(rule)
+    copy = copy.set('active', isActive(rule));
+    return copy;
 }
 
 function enableRule(rule) {
     if(applyRule(rule)) {
         activeRules.push(rule);
     }
+    return copyRule(rule);
 };
 
 function applyRule(rule) {
@@ -185,4 +201,14 @@ function applyRule(rule) {
         }
     });
     return true;
+}
+
+/** Returns a rule by name */
+function ruleByName(ruleName) {
+    for(var i = 0; i < rules.length; i++) {
+        var rule = rules[i];
+        if(rule.name == ruleName) {
+            return rule;
+        }
+    }
 }
