@@ -69,7 +69,6 @@ class NavItem extends React.Component {
 class Home extends React.Component {
     constructor() {
         super();
-        this.toggleRule = this.toggleRule.bind(this);
         this.add = this.add.bind(this);
         this.state = {rules: []};
     }
@@ -81,12 +80,6 @@ class Home extends React.Component {
         });
     }
 
-    toggleRule(id) {
-        var cmp = this;
-        $.ajax("/api/rules/" + id + "/toggle").then(function(rules) {
-            cmp.setState({rules: rules});
-        });
-    }
 
     add() {
         var rules = this.state.rules;
@@ -102,7 +95,7 @@ class Home extends React.Component {
 
         var available = rules.map(function(rule) {
             i++;
-            return <Rule key={i} rule={rule} toggleRule={cmp.toggleRule} devices={cmp.props.devices}/>;
+            return <Rule key={i} rule={rule} devices={cmp.props.devices}/>;
         });
         return  <div className="col-md-12 m-t-2">
                  <div className="col-md-6 col-xs-10">
@@ -124,6 +117,7 @@ class Rule extends React.Component {
         this.setName = this.setName.bind(this);
         this.edit = this.edit.bind(this);
         this.remove = this.remove.bind(this);
+        this.toggleRule = this.toggleRule.bind(this);
         this.state = {rule: {devices: []}, edit: false};
     }
     componentWillMount() {
@@ -151,6 +145,14 @@ class Rule extends React.Component {
         rule.removed = true;
         this.setState({rule: rule});
         this.updateRule();
+    }
+    toggleRule(name) {
+        var cmp = this;
+        var name = this.state.rule.name;
+        $.ajax("/api/rule/" + name + "/toggle").then(function(rule) {
+            console.log(rule);
+            cmp.setState({rule: rule});
+        });
     }
     valueControl(id, key, value) {
         var rule = this.state.rule;
@@ -186,7 +188,7 @@ class Rule extends React.Component {
         });
     }
     render() {
-        var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
+        var toggle = this.state.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
         var devices = this.state.rule.devices;
         var cmp = this;
         var activeDevices; 
@@ -215,7 +217,7 @@ class Rule extends React.Component {
         return  <div>
                  <div className="row m-t-2">
                   <div className="col-md-10 col-xs-10 form-inline">
-                   <h4><a onClick={this.props.toggleRule.bind(this, this.props.rule.id)}><i className={toggle}></i></a> {name} </h4>
+                   <h4><a onClick={this.toggleRule}><i className={toggle}></i></a> {name} </h4>
                   </div>
                   <div className="col-md-2 col-xs-2">
                    <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}></i></a>
