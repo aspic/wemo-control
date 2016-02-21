@@ -7,9 +7,8 @@ import {HelloWorld} from 'webpack-react-starter';
 class App extends Component {
   render() {
     return (
-      <div className="container">
+      <div>
         <HelloWorld />
-        <p><img src="homer.jpg" width="240" /></p>
       </div>
     );
   }
