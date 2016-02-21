@@ -14,7 +14,7 @@ var config = {
 
   resolve: {
     modulesDirectories: ['node_modules', './src'],
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx', '.css']
   },
 
   plugins: [
