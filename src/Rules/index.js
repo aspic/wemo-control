@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
 
+import {Rule} from '../index.js';
+
 export default class NavItem extends Component {
     constructor() {
         super();
@@ -24,13 +26,12 @@ export default class NavItem extends Component {
 
     render() {
         var rules = this.state.rules;
-        // var cmp = this;
+        var cmp = this;
         var i = 0;
 
-        var available = rules.map(function() {
+        var available = rules.map(function(rule) {
             i++;
-            //return <Rule key={i} rule={rule} devices={cmp.props.devices}/>;
-            return <span>foo</span>;
+            return <Rule key={i} rule={rule} devices={cmp.props.devices}/>;
         });
         return (<div className="col-md-12 m-t-2">
                  <div className="col-md-6 col-xs-10">

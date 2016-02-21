@@ -3,14 +3,13 @@ import $ from 'jquery';
 import React, {Component} from 'react';
 
 // Custom modules
-import {Navbar, Rules} from '../index.js';
-
-var menu = ["modes", "devices"];
+import {Navbar, Rules, Globals} from '../index.js';
 
 export default class HelloWorld extends Component {
     constructor() {
         super();
-        this.state = {section: menu[0], devices: []};
+        console.log(Globals.server);
+        this.state = {section: Globals.menu[0], devices: []};
         this.sectionChooser = this.sectionChooser.bind(this);
     }
     sectionChooser(section) {
