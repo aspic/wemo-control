@@ -16,11 +16,6 @@ var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 bridge.init(config);
 
-app.use('/build', express.static('build'));
-
-app.get('/js/app.js', function (req, res) {
-    res.sendFile(path.join(__dirname, 'src/app.js'));
-});
 
 app.get('/api/devices', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
@@ -78,9 +73,7 @@ app.get('/api/rule/:name/:action', function (req, res) {
         });
 });
 
-app.get('*', function (req, res) {
-    res.sendFile(path.join(__dirname, 'build/index.html'));
-});
+app.use('/', express.static('examples'));
 
 function storeConfig() {
     return new Promise(function(resolve, reject) {
