@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd examples
+../node_modules/.bin/webpack-dev-server --devtool eval --progress --inline --colors --hot --content-base ../examples/
