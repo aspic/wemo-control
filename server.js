@@ -73,7 +73,7 @@ app.get('/api/rule/:name/:action', function (req, res) {
         });
 });
 
-app.use('/', express.static('examples'));
+app.use('/', express.static('frontend'));
 
 function storeConfig() {
     return new Promise(function(resolve, reject) {
