@@ -2,14 +2,14 @@ config.json
 node_modules
 dist/
 
-examples/npm-debug.log
-examples/*.eot
-examples/*.woff
-examples/*.ttf
-examples/*.woff2
-examples/*.svg
-examples/bundle.js
-examples/bundle.js.map
-examples/index.css
-examples/index.js
-examples/fontawesome.js
+frontend/npm-debug.log
+frontend/*.eot
+frontend/*.woff
+frontend/*.ttf
+frontend/*.woff2
+frontend/*.svg
+frontend/bundle.js
+frontend/bundle.js.map
+frontend/index.css
+frontend/index.js
+frontend/fontawesome.js
