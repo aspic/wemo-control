@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 // Custom modules
 import {Navbar, Rules, Globals} from '../index.js';
 
-export default class HelloWorld extends Component {
+export default class Container extends Component {
     constructor() {
         super();
         console.log(Globals.server);

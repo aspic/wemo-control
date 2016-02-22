@@ -5,8 +5,9 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var embedFileSize = 65536;
 
 var config = {
-  entry: ['./src/index'],
-
+  entry: [
+    './src/index'
+  ],
   output: {
     path: './dist',
     filename: 'index.min.js'
@@ -39,10 +40,10 @@ var config = {
       {test: /\.png$/, loader: 'url?limit=' + embedFileSize + '&mimetype=image/png'},
       {test: /\.jpg/, loader: 'url?limit=' + embedFileSize + '&mimetype=image/jpeg'},
       {test: /\.gif/, loader: 'url?limit=' + embedFileSize + '&mimetype=image/gif'},
-      {
-        test: /\.(otf|eot|ttf|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url?limit=' + embedFileSize
-      }
+      {test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" }, 
+      {test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" }, 
+      {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" }, 
+      {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file" }, 
     ],
     preLoaders: [
       {

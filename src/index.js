@@ -1,5 +1,5 @@
 // use this entry point to export your modules
-export {default as HelloWorld} from './HelloWorld';
+export {default as Container} from './Container';
 export {default as Navbar} from './Navbar';
 export {default as NavItem} from './NavItem';
 export {default as Rules} from './Rules';

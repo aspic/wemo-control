@@ -1,4 +1,15 @@
 config.json
 node_modules
 dist/
+
 examples/npm-debug.log
+examples/*.eot
+examples/*.woff
+examples/*.ttf
+examples/*.woff2
+examples/*.svg
+examples/bundle.js
+examples/bundle.js.map
+examples/index.css
+examples/index.js
+examples/fontawesome.js
