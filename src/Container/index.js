@@ -3,12 +3,11 @@ import $ from 'jquery';
 import React, {Component} from 'react';
 
 // Custom modules
-import {Navbar, Rules, Globals} from '../index.js';
+import {Navbar, Rules, Devices, Globals} from '../index.js';
 
 export default class Container extends Component {
     constructor() {
         super();
-        console.log(Globals.server);
         this.state = {section: Globals.menu[0], devices: []};
         this.sectionChooser = this.sectionChooser.bind(this);
     }
@@ -26,7 +25,7 @@ export default class Container extends Component {
         var section = <span>foo</span>;
         // TODO: map to components
         if(chosen === "devices") {
-            // section = <Devices devices={this.state.devices}/>
+            section = <Devices devices={this.state.devices}/>;
         } else if(chosen === "modes") {
             section = <Rules devices={this.state.devices}/>;
         }
