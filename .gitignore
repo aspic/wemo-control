@@ -11,5 +11,4 @@ frontend/*.svg
 frontend/bundle.js
 frontend/bundle.js.map
 frontend/index.css
-frontend/index.js
 frontend/fontawesome.js
