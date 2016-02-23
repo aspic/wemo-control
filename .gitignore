@@ -1,14 +1,4 @@
 config.json
 node_modules
 dist/
-
 frontend/npm-debug.log
-frontend/*.eot
-frontend/*.woff
-frontend/*.ttf
-frontend/*.woff2
-frontend/*.svg
-frontend/bundle.js
-frontend/bundle.js.map
-frontend/index.css
-frontend/fontawesome.js
