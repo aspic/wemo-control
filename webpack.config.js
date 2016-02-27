@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var _ = require('lodash');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var embedFileSize = 65536;
+require('es6-promise').polyfill();
 
 var config = {
   entry: [
