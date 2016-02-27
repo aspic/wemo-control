@@ -62,6 +62,18 @@ app.post('/api/rule/:id/update', function(req, res) {
     res.send(rule);
 });
 
+app.post('/api/rule/:id/remove', function(req, res) {
+    var id = req.params.id;
+    var removed = bridge.removeRule(id);
+    storeConfig()
+        .then(function(result) {
+            console.log(result);
+        }, function(err) {
+            console.log(err);
+        });
+    res.send(removed);
+});
+
 app.get('/api/rule/:name/:action', function (req, res) {
     var name = req.params.name;
     var action = req.params.action;

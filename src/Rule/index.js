@@ -15,7 +15,7 @@ export default class Rule extends Component {
         this.edit = this.edit.bind(this);
         this.remove = this.remove.bind(this);
         this.toggleRule = this.toggleRule.bind(this);
-        this.state = {rule: {devices: []}, edit: false};
+        this.state = {rule: {devices: []}, edit: false, removed: false};
     }
     componentWillMount() {
         this.setState({rule: this.props.rule, name: this.props.rule.name});
@@ -38,10 +38,18 @@ export default class Rule extends Component {
         this.setState({edit: !this.state.edit});
     }
     remove() {
-        var rule = this.state.rule;
-        rule.removed = true;
-        this.setState({rule: rule});
-        this.updateRule();
+        var cmp = this;
+        var id = this.state.rule.id;
+        $.ajax({
+            url: '/api/rule/' + id + '/remove',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (removed) {
+                console.log(removed);
+                cmp.setState({removed: removed});
+            }
+        });
     }
     toggleRule() {
         var cmp = this;
@@ -109,6 +117,9 @@ export default class Rule extends Component {
         var name = <span>{this.state.rule.name} ({devicesLength})</span>;
         if(this.state.edit) {
             name = <input type="text" name="name" className="form-control" defaultValue={this.state.name} onChange={this.setName}></input>;
+        }
+        if(this.state.removed) {
+            return <div></div>;
         }
         return (<div>
                  <div className="row m-t-2">

@@ -68,11 +68,6 @@ exports.getRules = function() {
 
 /** Adds or updates a rule */
 exports.updateRule = function(rule, id) {
-    if(rule.removed) {
-        rules.slice(rule.id, 1);
-        return rule;
-    }
-
    var newRule = {
         id: rule.id,
         name: rule.name,
@@ -90,6 +85,25 @@ exports.updateRule = function(rule, id) {
    }
    return newRule;
 }
+
+/* Removes rule */
+exports.removeRule = function(id) {
+    var removeIndex = -1;
+    for(var i = 0; i < rules.length; i++) {
+        var rule = rules[i];
+        console.log(rule.id == id);
+        if(rule.id == id) {
+            removeIndex = i;
+            break;
+        }
+    }
+    if(removeIndex >= 0) {
+        rules.splice(removeIndex, 1);
+        return true;
+    }
+    return false;
+}
+
 
 /* Disables, enables or toggles rule by name */
 exports.controlRule = function(name, action) {
