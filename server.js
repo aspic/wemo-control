@@ -24,7 +24,7 @@ app.get('/api/devices', function (req, res) {
 
 app.get('/api/device/:id/toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
-    var id = req.param("id");
+    var id = req.params.id;
     bridge.toggle(id)
         .then(function(result) {
             res.send(result);
@@ -34,8 +34,8 @@ app.get('/api/device/:id/toggle', function (req, res) {
 });
 app.get('/api/device/:id/brightness/:value', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
-    var id = req.param("id");
-    var value = req.param("value");
+    var id = req.params.id;
+    var value = req.params.value;
 
     bridge.setValue(id, 'brightness', value)
         .then(function(result) {
@@ -51,7 +51,7 @@ app.get('/api/rules/', function(req, res) {
 });
 app.post('/api/rule/:id/update', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
-    var id = req.param("id");
+    var id = req.params.id;
     var rule = bridge.updateRule(req.body, id);
     storeConfig()
         .then(function(result) {
@@ -63,8 +63,8 @@ app.post('/api/rule/:id/update', function(req, res) {
 });
 
 app.get('/api/rule/:name/:action', function (req, res) {
-    var name = req.param("name");
-    var action = req.param("action");
+    var name = req.params.name;
+    var action = req.params.action;
     bridge.controlRule(name, action)
         .then(function(rule) {
             res.send(rule);
