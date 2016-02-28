@@ -16,16 +16,16 @@ export default class Container extends Component {
     }
     componentWillMount() {
         var cmp = this;
-        $.ajax("/api/devices").then(function(data) {
+        $.ajax('/api/devices').then(function(data) {
             cmp.setState({devices: data});
         });
     }
     render() {
         var chosen = this.state.section;
-        var section = <span>foo</span>;
+        var section;
         // TODO: map to components
         if(chosen === "devices") {
-            section = <Devices devices={this.state.devices}/>;
+            section = <Devices />;
         } else if(chosen === "modes") {
             section = <Rules devices={this.state.devices}/>;
         }

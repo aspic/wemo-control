@@ -57,7 +57,7 @@ export default class LightDevice extends Component {
     render() {
         var name = this.state.device.name;
         var classes = "icon-tinted" + (this.state.clicked ? " active" : "");
-        var dimValue = this.state.device.brightness;
+        var dimValue = this.state.device.brightness.replace(":0", "");
         return (<div className="m-t-1">
                 <h4>
                  <a className={classes} onClick={this.clicked}><i className="fa fa-lightbulb-o fa-lg"></i></a> {name}
