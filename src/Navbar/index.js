@@ -1,9 +1,7 @@
 import './index.css';
 
 import React, {Component} from 'react';
-import {NavItem} from '../index.js';
-
-var menu = ['modes', 'devices'];
+import {NavItem, Globals} from '../index.js';
 
 export default class Navbar extends Component {
     constructor() {
@@ -15,7 +13,7 @@ export default class Navbar extends Component {
     }
     render() {
         var cmp = this;
-        var sections = menu.map(function(item) {
+        var sections = Globals.menu.map(function(item) {
             return <NavItem key={item} name={item} handler={cmp.select} chosen={cmp.props.section}/>;
         });
         return (<nav className="navbar navbar-dark bg-inverse">
