@@ -13,6 +13,12 @@ export function getRules(cb) {
     });
 }
 
+export function getLog(cb) {
+    $.ajax(Globals.host + '/api/log').then(function(data) {
+        cb(data);
+    });
+}
+
 export function postToggleDevice(id, cb) {
     $.ajax(Globals.host + '/api/device/' + id + '/toggle').then(function(data) {
         cb(data);
