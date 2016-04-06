@@ -3,7 +3,9 @@ var Immutable = require('immutable');
 
 var plugins = {};
 var rules = [];
-var activeRules = [];
+var activeId = -1;
+
+var logs = [];
 
 /** exported functions */
 exports.init = function(config) {
@@ -13,7 +15,7 @@ exports.init = function(config) {
         registerPlugin(key, require('./plugins/' + config.plugins[key]));
     });
     initPlugins(); 
-}
+};
 
 
 exports.getDevices = function() {
@@ -22,7 +24,11 @@ exports.getDevices = function() {
         devices = [].concat(devices, plugin.getDevices());
     });
     return devices;
-}
+};
+
+exports.getLog = function() {
+    return logs;
+};
 
 exports.toggle = function(id) {
     return new Promise(function(resolve, reject) {
@@ -35,7 +41,7 @@ exports.toggle = function(id) {
             reject("device " + id + " does not support setEnabled");
         }
     });
-}
+};
 
 exports.setValue = function(id, key, value) {
     return new Promise(function(resolve, reject) {
@@ -44,7 +50,6 @@ exports.setValue = function(id, key, value) {
             reject("device with id: " + id + " not found");
         }
         var setter = toSetter(key);
-        console.log(setter);
         if(device && typeof(device[setter]) === 'function') {
             device[setter](value, function() {
                 resolve(device);
@@ -53,65 +58,54 @@ exports.setValue = function(id, key, value) {
             reject("device with id: " + id + " does not support setter: " + setter + "()");
         }
     });
-}
+};
 
 exports.getRules = function() {
-    var i = 0;
-    var active = rules.map(function(rule) {
-        var rule = copyRule(rule);
-        rule = rule.set('id', i);
-        i++;
+    return rules.map(function(rule) {
+        rule.active = rule.id == activeId;
         return rule;
     });
-    return active;
-}
+};
 
 /** Adds or updates a rule */
-exports.updateRule = function(rule, id) {
-   var newRule = {
+exports.updateRule = function(rule) {
+
+    var index = ruleIndex(rule.id);
+    if(rule.removed) {
+        if(index >= 0) {
+            rules.splice(index, 1);
+            log('removed rule', rule.id);
+        }
+        return this.getRules();
+    }
+
+    var newRule = {
         id: rule.id,
         name: rule.name,
         icon: rule.icon,
         devices: rule.devices
-   } 
-   if(rule.id >= rules.length) {
-        rules.push(newRule);
-   } else if(id < 0) {
-        var id = rules.length;
-        newRule.id = id;
-        rules.push(newRule);
-   } else {
-        rules[rule.id] = newRule;
-   }
-   return newRule;
-}
+    };
 
-/* Removes rule */
-exports.removeRule = function(id) {
-    var removeIndex = -1;
-    for(var i = 0; i < rules.length; i++) {
-        var rule = rules[i];
-        console.log(rule.id == id);
-        if(rule.id == id) {
-            removeIndex = i;
-            break;
-        }
+    if(index >= 0) {
+        rules[index] = newRule;
+        log('updated rule', rule.id);
+    } else {
+        rules.push(newRule);
+        log('added rule', rule.id);
     }
-    if(removeIndex >= 0) {
-        rules.splice(removeIndex, 1);
-        return true;
-    }
-    return false;
-}
-
+    return this.getRules();
+};
 
 /* Disables, enables or toggles rule by name */
-exports.controlRule = function(name, action) {
+exports.controlRule = function(id, action) {
     return new Promise(function(resolve, reject) {
-        var rule = ruleByName(name);
+        var rule = ruleById(id);
+
+        console.log(rule);
         if (rule) {
             if(action == "toggle") {
-                resolve(isActive(rule) ? disableRule(rule) : enableRule(rule));
+                isActive(rule) ? disableRule(rule) : enableRule(rule);
+                resolve(this.getRules());
             } else if(action == "enable") {
                 resolve(enableRule(rule));
             } else if(action == "disable") {
@@ -120,20 +114,27 @@ exports.controlRule = function(name, action) {
                 reject("action " + action + " not supported");
             }
         } else {
-            reject("unable to find rule: " + name);
+            reject("unable to find rule: " + id);
         }
-    });
-}
+    }.bind(this));
+};
 
 /** helpers */
 function registerPlugin(name, plugin) {
-    var enabled = {
+    plugins[name] = {
         init: plugin.init,
         getDevices: plugin.getDevices
     };
-
-    plugins[name] = enabled;
     console.log("Enabled plugin: " + name);
+}
+
+function log(action, ruleId) {
+    logs.push({
+        action: action,
+        rule: ruleId,
+        at: Date.now()
+    });
+    console.log(logs);
 }
 
 function initPlugins(plugins) {
@@ -164,46 +165,29 @@ function toSetter(key) {
 }
 
 function isActive(rule) {
-    for(var i = 0; i < activeRules.length; i++) {
-        if(activeRules[i].id == rule.id) {
-            return true;
-        } 
-    }
-    return false;
+    return activeId === rule.id;
 }
 
 function disableRule(rule) {
-    for(var i = 0; i < activeRules.length; i++) {
-        var activeRule = activeRules[i];
-        if(rule.id == activeRule.id) {
-            activeRules.splice(i, 1);
-            break;
-        }
-    }    
-    // Re-apply last rule
-    if(activeRules.length > 0) {
-        applyRule(activeRules[activeRules.length - 1]);
-    }
-    return copyRule(rule);
+    log('disabled rule', rule.id);
+    activeId = -1;
 }
 
 function copyRule(rule) {
-    var copy = Immutable.Map(rule)
+    var copy = Immutable.Map(rule);
     copy = copy.set('active', isActive(rule));
     return copy;
 }
 
 function enableRule(rule) {
     if(applyRule(rule)) {
-        activeRules.push(rule);
+        activeId = rule.id;
     }
-    return copyRule(rule);
-};
+    log('enabled rule', rule.id);
+}
 
 function applyRule(rule) {
-    var rules = rule.devices;
     rule.devices.map(function(deviceRule) {
-        var device = getDevice(deviceRule.id);
         for (var prop in deviceRule) {
             exports.setValue(deviceRule.id, prop, deviceRule[prop])
                 .then(function(result) {
@@ -217,12 +201,20 @@ function applyRule(rule) {
     return true;
 }
 
-/** Returns a rule by name */
-function ruleByName(ruleName) {
+function ruleIndex(id) {
     for(var i = 0; i < rules.length; i++) {
-        var rule = rules[i];
-        if(rule.name == ruleName) {
-            return rule;
+        if(id == rules[i].id) {
+            return i;
         }
     }
+    return -1;
+}
+
+function ruleById(id) {
+    for(var i = 0; i < rules.length; i++) {
+        if(id == rules[i].id) {
+            return rules[i];
+        }
+    }
+    return;
 }

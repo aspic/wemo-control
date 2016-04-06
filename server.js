@@ -10,6 +10,13 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    next();
+});
+
 /** run wemo and load config */
 var bridge = require('./bridge');
 var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
@@ -18,12 +25,10 @@ bridge.init(config);
 
 
 app.get('/api/devices', function (req, res) {
-    res.setHeader('Content-Type', 'application/json');
     res.send(bridge.getDevices());
 });
 
 app.get('/api/device/:id/toggle', function (req, res) {
-    res.setHeader('Content-Type', 'application/json');
     var id = req.params.id;
     bridge.toggle(id)
         .then(function(result) {
@@ -33,7 +38,6 @@ app.get('/api/device/:id/toggle', function (req, res) {
         });
 });
 app.get('/api/device/:id/brightness/:value', function (req, res) {
-    res.setHeader('Content-Type', 'application/json');
     var id = req.params.id;
     var value = req.params.value;
 
@@ -46,13 +50,15 @@ app.get('/api/device/:id/brightness/:value', function (req, res) {
 });
 
 app.get('/api/rules/', function(req, res) {
-    res.setHeader('Content-Type', 'application/json');
     res.send(bridge.getRules());
 });
+app.get('/api/log/', function(req, res) {
+    res.send(bridge.getLog());
+});
+
 app.post('/api/rule/:id/update', function(req, res) {
-    res.setHeader('Content-Type', 'application/json');
     var id = req.params.id;
-    var rule = bridge.updateRule(req.body, id);
+    var rule = bridge.updateRule(req.body);
     storeConfig()
         .then(function(result) {
             console.log(result);
@@ -64,22 +70,22 @@ app.post('/api/rule/:id/update', function(req, res) {
 
 app.post('/api/rule/:id/remove', function(req, res) {
     var id = req.params.id;
-    var removed = bridge.removeRule(id);
+    var rules = bridge.updateRule({id: id, removed: true});
     storeConfig()
         .then(function(result) {
             console.log(result);
         }, function(err) {
             console.log(err);
         });
-    res.send(removed);
+    res.send(rules);
 });
 
-app.get('/api/rule/:name/:action', function (req, res) {
-    var name = req.params.name;
+app.get('/api/rule/:id/:action', function (req, res) {
+    var name = req.params.id;
     var action = req.params.action;
     bridge.controlRule(name, action)
-        .then(function(rule) {
-            res.send(rule);
+        .then(function(rules) {
+            res.send(rules);
         }, function(err) {
             res.status(404).send(err);
         });
