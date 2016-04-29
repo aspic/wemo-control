@@ -32,8 +32,12 @@ export function postBrightness(id, value, cb) {
 }
 
 export function postToggleRule(id, cb) {
-    $.ajax(Globals.host + '/api/rule/' + id + '/toggle').then(function (data) {
-        cb(data);
+    $.ajax({
+        url: Globals.host + '/api/rule/' + id + '/toggle',
+        type: 'POST',
+        success: function (data) {
+            cb(data);
+        }
     });
 }
 

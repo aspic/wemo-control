@@ -86,7 +86,7 @@ app.post('/api/rule/:id/remove', function(req, res) {
     res.send(rules);
 });
 
-app.get('/api/rule/:id/:action', function (req, res) {
+app.post('/api/rule/:id/:action', function (req, res) {
     var name = req.params.id;
     var action = req.params.action;
     res.setHeader('Content-Type', 'application/json');
