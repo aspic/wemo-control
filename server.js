@@ -60,8 +60,7 @@ app.get('/api/log/', function(req, res) {
     res.send(bridge.getLog());
 });
 
-app.post('/api/rule/:id/update', function(req, res) {
-    var id = req.params.id;
+app.post('/api/rule/update', function(req, res) {
     var rule = bridge.updateRule(req.body);
     res.setHeader('Content-Type', 'application/json');
     storeConfig()

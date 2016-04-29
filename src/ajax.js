@@ -41,9 +41,9 @@ export function postToggleRule(id, cb) {
     });
 }
 
-export function postUpdateRule(name, rule, cb) {
+export function postUpdateRule(rule, cb) {
     $.ajax({
-        url: Globals.host + '/api/rule/' + name + '/update',
+        url: Globals.host + '/api/rule/update',
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',

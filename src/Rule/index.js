@@ -74,9 +74,7 @@ export default class Rule extends Component {
 
     updateRule() {
         var stateRule = this.state.rule;
-        var id = stateRule.id;
-        // stateRule.devices = stateRule.devices;
-        postUpdateRule(id, stateRule, function(data) {
+        postUpdateRule(stateRule, function(data) {
             this.props.updated(data);
         }.bind(this));
     }
