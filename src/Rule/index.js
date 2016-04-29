@@ -49,7 +49,7 @@ export default class Rule extends Component {
     }
 
     toggleRule() {
-        postToggleRule(this.state.rule.id, function (data) {
+        postToggleRule(this.state.rule.name, function (data) {
             this.props.updated(data);
         }.bind(this));
     }

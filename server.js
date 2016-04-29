@@ -85,8 +85,8 @@ app.post('/api/rule/:id/remove', function(req, res) {
     res.send(rules);
 });
 
-app.post('/api/rule/:id/:action', function (req, res) {
-    var name = req.params.id;
+app.post('/api/rule/:name/:action', function (req, res) {
+    var name = req.params.name;
     var action = req.params.action;
     res.setHeader('Content-Type', 'application/json');
     bridge.controlRule(name, action)

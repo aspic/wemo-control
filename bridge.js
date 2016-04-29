@@ -96,9 +96,9 @@ exports.updateRule = function(rule) {
 };
 
 /* Disables, enables or toggles rule by name */
-exports.controlRule = function(id, action) {
+exports.controlRule = function(name, action) {
     return new Promise(function(resolve, reject) {
-        var rule = ruleById(id);
+        var rule = ruleByName(name);
 
         console.log(rule);
         if (rule) {
@@ -113,7 +113,7 @@ exports.controlRule = function(id, action) {
                 reject("action " + action + " not supported");
             }
         } else {
-            reject("unable to find rule: " + id);
+            reject("unable to find rule for name=" + name);
         }
     }.bind(this));
 };
@@ -203,9 +203,9 @@ function ruleIndex(id) {
     return -1;
 }
 
-function ruleById(id) {
+function ruleByName(name) {
     for(var i = 0; i < rules.length; i++) {
-        if(id == rules[i].id) {
+        if(name === rules[i].name) {
             return rules[i];
         }
     }
