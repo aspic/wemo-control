@@ -1,5 +1,4 @@
 var Promise = require('promise');
-var Immutable = require('immutable');
 
 var plugins = {};
 var rules = [];
@@ -137,7 +136,7 @@ function log(action, ruleId) {
     console.log(logs);
 }
 
-function initPlugins(plugins) {
+function initPlugins() {
     apply(function(plugin) {
         plugin.init();
     });
@@ -171,12 +170,6 @@ function isActive(rule) {
 function disableRule(rule) {
     log('disabled rule', rule.id);
     activeId = -1;
-}
-
-function copyRule(rule) {
-    var copy = Immutable.Map(rule);
-    copy = copy.set('active', isActive(rule));
-    return copy;
 }
 
 function enableRule(rule) {
@@ -216,5 +209,4 @@ function ruleById(id) {
             return rules[i];
         }
     }
-    return;
 }
