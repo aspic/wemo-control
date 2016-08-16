@@ -128,12 +128,13 @@ function registerPlugin(name, plugin) {
 }
 
 function log(action, ruleId) {
-    logs.push({
+    var log = {
         action: action,
         rule: ruleId,
         at: new Date().toJSON()
-    });
-    console.log(logs);
+    };
+    console.log(log);
+    logs.push(log);
 }
 
 function initPlugins() {
@@ -144,6 +145,9 @@ function initPlugins() {
 
 /** Notified when devices change state */
 function stateListener(device) {
+    if(device.enabled) {
+        log("sensor", "was enabled " + device.enabled);
+    }
 
 }
 
