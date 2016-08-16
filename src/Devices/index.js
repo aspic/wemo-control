@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {LightDevice} from '../index.js';
+import {LightDevice, SocketDevice} from '../index.js';
 import { getDevices } from '../ajax';
 
 export default class Devices extends Component {
@@ -18,6 +18,8 @@ export default class Devices extends Component {
         var devices = this.state.devices.map(function (device) {
             if (device.type === 'light') {
                 return <LightDevice key={device.id} device={device}/>;
+            } else if(device.type === 'socket') {
+                return <SocketDevice key={device.id} device={device} />;
             }
         });
         return (<div className="m-t-2">
