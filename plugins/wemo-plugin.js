@@ -1,10 +1,8 @@
 /**
  * https://github.com/timonreinhard/wemo-client
  */
-var Immutable = require('immutable');
 var Wemo = require('wemo-client');
 var wemo = new Wemo();
-var client; 
 
 var LIGHT_DIMMABLE = "dimmableLight";
 var devices = [];
@@ -12,23 +10,31 @@ var devices = [];
 exports.init = function() {
     console.log("Starts initiating wemo plugin");
     wemo.discover(function(deviceInfo) {
-        client = wemo.client(deviceInfo);
-        client.getEndDevices(function(err, data){
-            devices = loadDevices(data);
+        var client = wemo.client(deviceInfo);
+        var modelName = deviceInfo.modelName;
+        if(modelName === "Bridge") {
+            client.getEndDevices(function(err, data){
+                devices = devices.concat(loadDevices(data, client));
+                console.log("Wemo plugin initiated with " + devices.length + " devices");
+            });
+        } else if(modelName === "Socket") {
+            devices.push(registerSocket(deviceInfo, client));
             console.log("Wemo plugin initiated with " + devices.length + " devices");
-        });
+        } else {
+            console.log("Unable to handle device with name: " + modelName);
+        }
     });
 };
 
-function loadDevices(devices) {
+function loadDevices(devices, client) {
     return devices.map(function(device) {
         if(device.deviceType === LIGHT_DIMMABLE) {
-            return registerLight(device);
-        } 
+            return registerLight(device, client);
+        }
     });
 }
 
-function registerLight(device) {
+function registerLight(device, client) {
     return {
         id: device.deviceId,
         name: device.friendlyName,
@@ -39,7 +45,7 @@ function registerLight(device) {
             var enabledValue = enabled ? 1 : 0;
             var device = this;
             client.setDeviceStatus(this.id, 10006, enabledValue, function(err, resp) {
-                device.enabled = enabled; 
+                device.enabled = enabled;
                 cb();
             });
         },
@@ -51,13 +57,34 @@ function registerLight(device) {
             }
             client.setDeviceStatus(this.id, 10008, value, function(err, resp) {
                 device.brightness = value;
-                device.enabled = value === "0" ? false : true;
+                device.enabled = value !== "0";
                 cb();
             });
         }
     }
 }
 
-exports.getDevices = function() {
-    return devices;
+function registerSocket(device, client) {
+    return {
+        id: device.serialNumber,
+        name: device.friendlyName,
+        type: 'socket',
+        enabled: device.binaryState === '1',
+        setEnabled: function(enabled, cb) {
+            var enabledValue = enabled ? 1 : 0;
+            var device = this;
+            client.setBinaryState(enabledValue, function(err, response) {
+                if(!err) {
+                    device.enabled = enabled;
+                    cb();
+                } else {
+                    console.log(err);
+                }
+            });
+        }
+    };
 }
+
+exports.getDevices = function () {
+    return devices;
+};
