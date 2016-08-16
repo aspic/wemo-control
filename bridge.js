@@ -131,7 +131,7 @@ function log(action, ruleId) {
     logs.push({
         action: action,
         rule: ruleId,
-        at: Date.now()
+        at: new Date().toJSON()
     });
     console.log(logs);
 }
@@ -144,7 +144,7 @@ function initPlugins() {
 
 /** Notified when devices change state */
 function stateListener(device) {
-    console.log(device);
+
 }
 
 function getDevice(id) {
