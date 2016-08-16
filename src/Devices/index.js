@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {LightDevice, SocketDevice} from '../index.js';
 import { getDevices } from '../ajax';
+import { mapDevices } from '../deviceMapping';
 
 export default class Devices extends Component {
     constructor() {
@@ -15,13 +15,7 @@ export default class Devices extends Component {
     }
 
     render() {
-        var devices = this.state.devices.map(function (device) {
-            if (device.type === 'light') {
-                return <LightDevice key={device.id} device={device}/>;
-            } else if(device.type === 'socket') {
-                return <SocketDevice key={device.id} device={device} />;
-            }
-        });
+        var devices = mapDevices(this.state.devices);
         return (<div className="m-t-2">
             <div className="col-md-6 col-xs-12">{devices}</div>
             <div className="col-md-6 col-xs-12">

@@ -2,7 +2,8 @@ import './index.css';
 
 import React, {Component} from 'react';
 
-import {LightDevice, DeviceDropdown} from '../index.js';
+import {DeviceDropdown } from '../index.js';
+import { mapDevices } from '../deviceMapping';
 import { postUpdateRule, postToggleRule, postRemoveRule } from '../ajax';
 
 export default class Rule extends Component {
@@ -74,7 +75,7 @@ export default class Rule extends Component {
 
     updateRule() {
         var stateRule = this.state.rule;
-        postUpdateRule(stateRule, function(data) {
+        postUpdateRule(stateRule, function (data) {
             this.props.updated(data);
         }.bind(this));
     }
@@ -87,9 +88,7 @@ export default class Rule extends Component {
         var availableDevices;
         var devicesLength = 0;
         if (devices) {
-            activeDevices = devices.map(function (device) {
-                return <LightDevice key={device.id} device={device} valueControl={cmp.valueControl}/>;
-            });
+            activeDevices = mapDevices(devices, cmp.valueControl);
             availableDevices = this.props.devices.filter(function (device) {
                 return !devices.some(function (device2) {
                     return device.id === device2.id;
@@ -109,7 +108,7 @@ export default class Rule extends Component {
                     name="name"
                     className="form-control"
                     defaultValue={this.state.name}
-                    onChange={this.setName} />);
+                    onChange={this.setName}/>);
         }
         if (this.state.removed) {
             return <div></div>;
@@ -117,11 +116,11 @@ export default class Rule extends Component {
         return (<div>
             <div className="row m-t-2">
                 <div className="col-md-10 col-xs-10 form-inline">
-                    <h4><a onClick={this.toggleRule}><i className={toggle}></i></a> {name} </h4>
+                    <h4><a onClick={this.toggleRule}><i className={toggle}/></a> {name} </h4>
                 </div>
                 <div className="col-md-2 col-xs-2">
-                    <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}></i></a>
-                    <a className="pull-right"><i className="fa fa-times -o fa-lg" onClick={this.remove}></i></a>
+                    <a><i className="fa fa-pencil-square-o fa-lg" onClick={this.edit}/></a>
+                    <a className="pull-right"><i className="fa fa-times -o fa-lg" onClick={this.remove}/></a>
                 </div>
             </div>
             <div className={detailClasses}>
