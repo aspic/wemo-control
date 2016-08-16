@@ -20,6 +20,9 @@ exports.init = function() {
         } else if(modelName === "Socket") {
             devices.push(registerSocket(deviceInfo, client));
             console.log("Wemo plugin initiated with " + devices.length + " devices");
+        } else if(modelName === "Sensor") {
+            devices.push(registerSensor(deviceInfo, client));
+            console.log("Wemo plugin initiated with " + devices.length + " devices");
         } else {
             console.log("Unable to handle device with name: " + modelName);
         }
@@ -65,6 +68,9 @@ function registerLight(device, client) {
 }
 
 function registerSocket(device, client) {
+    client.on('binaryState', function(value) {
+        console.log('Device turned %s', value === '1' ? 'on' : 'off')
+    });
     return {
         id: device.serialNumber,
         name: device.friendlyName,
@@ -83,6 +89,18 @@ function registerSocket(device, client) {
             });
         }
     };
+}
+
+function registerSensor(device, client) {
+    client.on('binaryState', function(value) {
+        console.log('Senors turned %s', value === '1' ? 'on' : 'off')
+    });
+    return {
+        id: device.serialNumber,
+        name: device.friendlyName,
+        type: 'sensor',
+        enabled: device.binaryState === '1'
+    }
 }
 
 exports.getDevices = function () {
