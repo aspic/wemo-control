@@ -7,7 +7,7 @@ var wemo = new Wemo();
 var LIGHT_DIMMABLE = "dimmableLight";
 var devices = [];
 
-exports.init = function() {
+exports.init = function(listener) {
     console.log("Starts initiating wemo plugin");
     wemo.discover(function(deviceInfo) {
         var client = wemo.client(deviceInfo);
@@ -18,10 +18,10 @@ exports.init = function() {
                 console.log("Wemo plugin initiated with " + devices.length + " devices");
             });
         } else if(modelName === "Socket") {
-            devices.push(registerSocket(deviceInfo, client));
+            devices.push(registerSocket(deviceInfo, client, listener));
             console.log("Wemo plugin initiated with " + devices.length + " devices");
         } else if(modelName === "Sensor") {
-            devices.push(registerSensor(deviceInfo, client));
+            devices.push(registerSensor(deviceInfo, client, listener));
             console.log("Wemo plugin initiated with " + devices.length + " devices");
         } else {
             console.log("Unable to handle device with name: " + modelName);
@@ -67,15 +67,12 @@ function registerLight(device, client) {
     }
 }
 
-function registerSocket(device, client) {
-    client.on('binaryState', function(value) {
-        console.log('Device turned %s', value === '1' ? 'on' : 'off')
-    });
-    return {
-        id: device.serialNumber,
-        name: device.friendlyName,
+function registerSocket(deviceInfo, client, listener) {
+    var device = {
+        id: deviceInfo.serialNumber,
+        name: deviceInfo.friendlyName,
         type: 'socket',
-        enabled: device.binaryState === '1',
+        enabled: deviceInfo.binaryState === '1',
         setEnabled: function(enabled, cb) {
             var enabledValue = enabled ? 1 : 0;
             var device = this;
@@ -89,18 +86,25 @@ function registerSocket(device, client) {
             });
         }
     };
+    client.on('binaryState', function(value) {
+        device.enabled = value === '1';
+        listener(device);
+    });
+    return device;
 }
 
-function registerSensor(device, client) {
-    client.on('binaryState', function(value) {
-        console.log('Senors turned %s', value === '1' ? 'on' : 'off')
-    });
-    return {
-        id: device.serialNumber,
-        name: device.friendlyName,
+function registerSensor(deviceInfo, client, listener) {
+    var device = {
+        id: deviceInfo.serialNumber,
+        name: deviceInfo.friendlyName,
         type: 'sensor',
-        enabled: device.binaryState === '1'
-    }
+        enabled: deviceInfo.binaryState === '1'
+    };
+    client.on('binaryState', function(value) {
+        device.enabled = value === '1';
+        listener(device);
+    });
+    return device;
 }
 
 exports.getDevices = function () {

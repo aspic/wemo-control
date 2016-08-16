@@ -138,8 +138,13 @@ function log(action, ruleId) {
 
 function initPlugins() {
     apply(function(plugin) {
-        plugin.init();
+        plugin.init(stateListener);
     });
+}
+
+/** Notified when devices change state */
+function stateListener(device) {
+    console.log(device);
 }
 
 function getDevice(id) {
