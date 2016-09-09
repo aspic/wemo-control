@@ -19,28 +19,31 @@ export default class Item extends Component {
 
         return (
             <tr>
-                <td>{this.props.log.at}</td>
                 <td>{this.props.log.type}</td>
                 <td>{this.props.log.name}</td>
                 {rendered}
+                <th scope="row">{this.props.log.at}</th>
             </tr>
         );
     }
 
     static plugin(log) {
         return (
-            <td>enabled: {log.enabled ? "true":"false"}</td>
+            <td className={Item.classes(log)}>enabled: {log.enabled ? "true" : "false"}</td>
         );
     }
     static state(log) {
         return (
-            <td>enabled: {log.enabled ? "true":"false"}</td>
+            <td className={Item.classes(log)}>state: {log.enabled ? "on" : "off"}</td>
         );
     }
     static rule(log) {
         return (
             <td>rule was: {log.action}</td>
         );
+    }
+    static classes(log) {
+        return log.enabled ? "table-success" : "table-warning";
     }
 }
 

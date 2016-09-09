@@ -7,4 +7,5 @@ body {
   font-size: 16px;
   font-weight: 300;
   background-color: #f3f4f5;
+  overflow-y: scroll;
 }

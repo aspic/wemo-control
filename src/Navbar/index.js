@@ -17,7 +17,7 @@ export default class Navbar extends Component {
             return <NavItem key={item} name={item} handler={cmp.select} chosen={cmp.props.section}/>;
         });
         return (<nav className="navbar navbar-dark bg-inverse">
-                 <a className="navbar-brand" href="#">Wemo Control</a>
+                 <a className="navbar-brand" href="#">Home Control</a>
                  <ul className="nav navbar-nav">
                   {sections}
                  </ul>

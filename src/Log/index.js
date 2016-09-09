@@ -23,13 +23,13 @@ export default class Log extends Component {
         });
 
         return (
-            <table className="table table-sm">
+            <table className="table table-sm table-striped">
                 <thead>
                     <tr>
-                        <th>at</th>
                         <th>type</th>
                         <th>name</th>
                         <th>description</th>
+                        <th>at</th>
                     </tr>
                 </thead>
                 <tbody>
