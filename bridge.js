@@ -1,4 +1,5 @@
 var Promise = require('promise');
+var moment = require('moment');
 
 var plugins = {};
 var rules = [];
@@ -73,7 +74,7 @@ exports.updateRule = function(rule) {
     if(rule.removed) {
         if(index >= 0) {
             rules.splice(index, 1);
-            log('removed rule', rule.id);
+            logRuleEdited(rule.name, 'removed');
         }
         return this.getRules();
     }
@@ -87,10 +88,10 @@ exports.updateRule = function(rule) {
 
     if(index >= 0) {
         rules[index] = newRule;
-        log('updated rule', rule.id);
+        logRuleEdited(rule.name, 'updated');
     } else {
         rules.push(newRule);
-        log('added rule', rule.id);
+        logRuleEdited(newRule.name, 'added');
     }
     return this.getRules();
 };
@@ -100,7 +101,6 @@ exports.controlRule = function(name, action) {
     return new Promise(function(resolve, reject) {
         var rule = ruleByName(name);
 
-        console.log(rule);
         if (rule) {
             if(action == "toggle") {
                 isActive(rule) ? disableRule(rule) : enableRule(rule);
@@ -124,17 +124,33 @@ function registerPlugin(name, plugin) {
         init: plugin.init,
         getDevices: plugin.getDevices
     };
-    console.log("Enabled plugin: " + name);
+    logPlugin(name, true);
 }
 
-function log(action, ruleId) {
-    var log = {
-        action: action,
-        rule: ruleId,
-        at: new Date().toJSON()
-    };
-    console.log(log);
-    logs.push(log);
+/** Should only be called by log*methods */
+function log(logObject) {
+    if(!logObject.type) {
+        console.log("No type specified for logObject");
+        return;
+    }
+    logObject['at'] = moment().format();
+    logs.push(logObject);
+}
+
+function logRuleChange(ruleName, enabled) {
+    log({type: 'rule', name: ruleName, enabled: enabled});
+}
+
+function logRuleEdited(ruleName, action) {
+    log({type: 'rule', name: ruleName, action: action});
+}
+
+function logStateChange(deviceName, enabled) {
+    log({type: 'state', name: deviceName, enabled: enabled});
+}
+
+function logPlugin(pluginName, enabled) {
+    log({type: 'plugin', name: pluginName, enabled: enabled});
 }
 
 function initPlugins() {
@@ -146,7 +162,7 @@ function initPlugins() {
 /** Notified when devices change state */
 function stateListener(device) {
     if(device.enabled) {
-        log("sensor", "was enabled " + device.enabled);
+        logStateChange(device.name, device.enabled);
     }
 
 }
@@ -177,7 +193,7 @@ function isActive(rule) {
 }
 
 function disableRule(rule) {
-    log('disabled rule', rule.id);
+    logRuleChange(rule.name, rule.enabled);
     activeId = -1;
 }
 
@@ -185,7 +201,7 @@ function enableRule(rule) {
     if(applyRule(rule)) {
         activeId = rule.id;
     }
-    log('enabled rule', rule.id);
+    logRuleChange(rule.name, true);
 }
 
 function applyRule(rule) {
