@@ -102,10 +102,12 @@ function registerSensor(deviceInfo, client, listener) {
     };
     client.on('binaryState', function(value) {
         var enabled = value === '1';
-        if(device.enabled != enabled) {
+        var changed = device.enabled != enabled;
+
+        device.enabled = enabled;
+        if(changed) {
             listener(device);
         }
-        device.enabled = enabled;
     });
     return device;
 }
