@@ -6,6 +6,7 @@ export {default as Rules} from './Rules';
 export {default as Rule} from './Rule';
 export {default as LightDevice} from './LightDevice';
 export {default as SocketDevice} from './SocketDevice';
+export {default as SensorDevice} from './SensorDevice';
 export {default as Slider} from './Slider';
 export {default as DeviceDropdown} from './DeviceDropdown';
 export {default as Devices} from './Devices';
