@@ -161,10 +161,7 @@ function initPlugins() {
 
 /** Notified when devices change state */
 function stateListener(device) {
-    if(device.enabled) {
-        logStateChange(device.name, device.enabled);
-    }
-
+    logStateChange(device.name, device.enabled);
 }
 
 function getDevice(id) {
