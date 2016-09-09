@@ -13,7 +13,6 @@ export default class Item extends Component {
 
     render() {
 
-        console.log(this.props.log);
         var fn = this.renderers[this.props.log.type];
         var rendered = fn ? fn(this.props.log) : "";
 

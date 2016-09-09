@@ -18,7 +18,6 @@ export default class Container extends Component {
 
     componentWillMount() {
         getDevices(function (data) {
-            console.log(data);
             this.setState({devices: data});
         }.bind(this));
     }

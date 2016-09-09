@@ -1,0 +1,15 @@
+.icon-tinted i {
+	color: black;
+  -webkit-transition: .4s;
+  -moz-transition: .4s;
+  transition: .4s;
+}
+
+.icon-tinted i:hover {
+  cursor: pointer; 
+  cursor: hand;
+}
+
+.icon-tinted.active i {
+	color: rgb(255, 201, 14);
+}
