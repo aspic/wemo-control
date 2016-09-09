@@ -137,8 +137,8 @@ function log(logObject) {
     logs.push(logObject);
 }
 
-function logRuleChange(ruleName, enabled) {
-    log({type: 'rule', name: ruleName, enabled: enabled});
+function logRuleChange(ruleName, action) {
+    log({type: 'rule', name: ruleName, action: action});
 }
 
 function logRuleEdited(ruleName, action) {
@@ -193,7 +193,7 @@ function isActive(rule) {
 }
 
 function disableRule(rule) {
-    logRuleChange(rule.name, rule.enabled);
+    logRuleChange(rule.name, 'disabled');
     activeId = -1;
 }
 
@@ -201,7 +201,7 @@ function enableRule(rule) {
     if(applyRule(rule)) {
         activeId = rule.id;
     }
-    logRuleChange(rule.name, true);
+    logRuleChange(rule.name, 'enabled');
 }
 
 function applyRule(rule) {

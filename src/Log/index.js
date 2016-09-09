@@ -19,15 +19,23 @@ export default class Log extends Component {
     render() {
 
         var items = this.state.log.map(function(item) {
-            return <Item key={item.at} at={item.at} action={item.action} rule={item.rule}/>;
+            return <Item key={item.log} log={item}/>;
         });
 
         return (
-            <div className="col-md-12 m-t-1">
-                <ul className="list-unstyled">
+            <table className="table table-sm">
+                <thead>
+                    <tr>
+                        <th>at</th>
+                        <th>type</th>
+                        <th>name</th>
+                        <th>description</th>
+                    </tr>
+                </thead>
+                <tbody>
                     {items}
-                </ul>
-            </div>
+                </tbody>
+            </table>
         );
     }
 }
