@@ -26,6 +26,17 @@ exports.getDevices = function() {
     return devices;
 };
 
+exports.getDevice = function(id) {
+    return new Promise(function(resolve, reject) {
+        var device = getDevice(id);
+        if(device) {
+            resolve(device);
+        } else {
+            reject("device " + id + " not found");
+        }
+    });
+};
+
 exports.getLog = function() {
     return logs;
 };

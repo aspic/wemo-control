@@ -28,6 +28,17 @@ app.get('/api/devices', function (req, res) {
     res.send(bridge.getDevices());
 });
 
+app.get('/api/device/:id', function (req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    var id = req.params.id;
+    bridge.getDevice(id)
+        .then(function(result) {
+            res.send(result)
+        }, function(err) {
+            res.send({ error: err});
+        });
+});
+
 app.get('/api/device/:id/toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.params.id;
