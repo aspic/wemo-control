@@ -1,10 +1,12 @@
-import './index.css';
 import React, {Component} from 'react';
+
+import { getDevice } from '../ajax';
 
 export default class SocketDevice extends Component {
     constructor() {
         super();
         this.state = {active: false, device: {}};
+        this.poll = this.poll.bind(this);
     }
 
     componentWillMount() {
@@ -13,6 +15,17 @@ export default class SocketDevice extends Component {
             this.setState({active: true});
         }
         this.setState({device: device});
+    }
+
+    componentDidMount() {
+        setTimeout(this.poll, 3000);
+    }
+
+    poll() {
+        getDevice(this.state.device.id, function(device) {
+            this.setState({active: device.enabled, device: device});
+            setTimeout(this.poll, 3000)
+        }.bind(this));
     }
 
     render() {

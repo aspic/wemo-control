@@ -7,6 +7,12 @@ export function getDevices(cb) {
     });
 }
 
+export function getDevice(id, cb) {
+    $.ajax(Globals.host + '/api/device/' + id).then(function(data) {
+        cb(data);
+    });
+}
+
 export function getRules(cb) {
     $.ajax(Globals.host + '/api/rules').then(function(rules) {
         cb(rules);
