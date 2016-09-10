@@ -181,8 +181,10 @@ function stateListener(device) {
     }
 
     /** Check conditionals */
-    for(var j = 0; j < conditionals.length; j++) {
-        checkRuleConditional(conditionals[j]);
+    if (conditionals) {
+        for(var j = 0; j < conditionals.length; j++) {
+            checkRuleConditional(conditionals[j]);
+        }
     }
 }
 
