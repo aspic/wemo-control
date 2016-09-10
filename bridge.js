@@ -191,15 +191,6 @@ function stateListener(device) {
     for(var j = 0; j < conditionals.length; j++) {
         checkRuleConditional(conditionals[j]);
     }
-
-    /**  Notify subscribed devices */
-    var devices = exports.getDevices();
-    for(var i = 0; i < devices.length; i++) {
-        var fn = devices[i].notify;
-        if(fn) {
-            fn(device)
-        }
-    }
 }
 
 function checkRuleConditional(conditional) {
@@ -257,9 +248,6 @@ function disableRule(rule) {
 }
 
 function enableRule(rule) {
-    if(rule.id === activeId) {
-        return;
-    }
     if(applyRule(rule)) {
         activeId = rule.id;
     }

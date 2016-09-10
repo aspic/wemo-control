@@ -5,13 +5,12 @@ var devices = [];
 
 exports.init = function(listener, config) {
     var device = {
-        id: 'cmd-' + Date.now(),
+        id: 'cmd-' + config.id,
         name: 'Command line plugin',
         type: 'cmd',
-        notify: function(device) {
-            if(device.enabled) {
+        setEnabled: function(enabled, cb) {
+            if(enabled) {
                 exec(config.cmd, function(error, stdout, stderr) {
-
                     if(error != null || stderr) {
                         console.log("error " + error);
                         console.log("stderr " + stderr);
@@ -20,6 +19,7 @@ exports.init = function(listener, config) {
                     }
                 });
             }
+            cb();
         }
     };
     devices = [device];
