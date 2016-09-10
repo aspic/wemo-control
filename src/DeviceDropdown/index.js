@@ -15,7 +15,7 @@ export default class DeviceDropdown extends Component {
             var deviceInfo = {id: device.id, name: device.name, type: device.type};
             return <a className="dropdown-item" onClick={cmp.props.addDevice.bind(cmp, deviceInfo)}>{device.name}</a>;
         });
-        var classes = "dropdown" + (this.state.open ? " open" : "");
+        var classes = 'dropdown' + (this.state.open ? ' open' : '');
         return (<div className={classes}>
                  <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" onClick={this.open}>
                   Devices

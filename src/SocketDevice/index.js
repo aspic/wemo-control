@@ -38,7 +38,7 @@ export default class SocketDevice extends Component {
 
     render() {
         var name = this.state.device.name;
-        var classes = "icon-tinted" + (this.state.clicked ? " active" : "");
+        var classes = 'icon-tinted' + (this.state.clicked ? ' active' : '');
         return (<div className="m-t-1">
             <h4>
                 <a className={classes} onClick={this.clicked}><i className="fa fa-plug fa-lg"/></a> {name}

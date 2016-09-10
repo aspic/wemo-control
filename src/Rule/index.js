@@ -81,7 +81,7 @@ export default class Rule extends Component {
     }
 
     render() {
-        var toggle = this.props.rule.active ? "fa fa-toggle-on fa-lg" : "fa fa-toggle-off fa-lg";
+        var toggle = this.props.rule.active ? 'fa fa-toggle-on fa-lg' : 'fa fa-toggle-off fa-lg';
         var devices = this.state.rule.devices;
         var cmp = this;
         var activeDevices;
@@ -98,8 +98,8 @@ export default class Rule extends Component {
         } else {
             availableDevices = this.props.devices;
         }
-        var detailClasses = (!this.state.edit ? "hidden" : "");
-        var dropdownClasses = (!availableDevices || availableDevices.length === 0) ? "hidden" : "col-md-2 col-xs-12";
+        var detailClasses = (!this.state.edit ? 'hidden' : '');
+        var dropdownClasses = (!availableDevices || availableDevices.length === 0) ? 'hidden' : 'col-md-2 col-xs-12';
         var name = <span>{this.state.rule.name} ({devicesLength})</span>;
         if (this.state.edit) {
             name = (

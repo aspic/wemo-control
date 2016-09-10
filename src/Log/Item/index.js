@@ -14,7 +14,7 @@ export default class Item extends Component {
     render() {
 
         var fn = this.renderers[this.props.log.type];
-        var rendered = fn ? fn(this.props.log) : "";
+        var rendered = fn ? fn(this.props.log) : '';
 
         return (
             <tr>
@@ -28,12 +28,12 @@ export default class Item extends Component {
 
     static plugin(log) {
         return (
-            <td className={Item.classes(log)}>enabled: {log.enabled ? "true" : "false"}</td>
+            <td className={Item.classes(log)}>enabled: {log.enabled ? 'true' : 'false'}</td>
         );
     }
     static state(log) {
         return (
-            <td className={Item.classes(log)}>state: {log.enabled ? "on" : "off"}</td>
+            <td className={Item.classes(log)}>state: {log.enabled ? 'on' : 'off'}</td>
         );
     }
     static rule(log) {
@@ -42,7 +42,7 @@ export default class Item extends Component {
         );
     }
     static classes(log) {
-        return log.enabled ? "table-success" : "table-warning";
+        return log.enabled ? 'table-success' : 'table-warning';
     }
 }
 

@@ -26,11 +26,11 @@ export default class Container extends Component {
         var chosen = this.state.section;
         var section;
         // TODO: map to components
-        if (chosen === "devices") {
+        if (chosen === 'devices') {
             section = <Devices />;
-        } else if (chosen === "modes") {
+        } else if (chosen === 'modes') {
             section = <Rules devices={this.state.devices}/>;
-        } else if (chosen === "log") {
+        } else if (chosen === 'log') {
             section = <Log />;
         }
         return (<div className="container">
