@@ -3,13 +3,15 @@ var moment = require('moment');
 
 var plugins = {};
 var rules = [];
+var conditionals = [];
 var activeId = -1;
 
 var logs = [];
 
 /** exported functions */
 exports.init = function(config) {
-    rules = config.rules; 
+    rules = config.rules;
+    conditionals = config.conditionals;
 
     Object.keys(config.plugins).forEach(function(key) {
         registerPlugin(key, require('./plugins/' + key), config.plugins[key]);
@@ -34,6 +36,12 @@ exports.getDevice = function(id) {
         } else {
             reject("device " + id + " not found");
         }
+    });
+};
+
+exports.getConditionals = function () {
+    return new Promise(function (resolve, reject) {
+        resolve(conditionals);
     });
 };
 
@@ -179,11 +187,41 @@ function stateListener(device) {
         logStateChange(device.name, device.enabled);
     }
 
+    /** Check conditionals */
+    for(var j = 0; j < conditionals.length; j++) {
+        checkRuleConditional(conditionals[j]);
+    }
+
+    /**  Notify subscribed devices */
     var devices = exports.getDevices();
     for(var i = 0; i < devices.length; i++) {
         var fn = devices[i].notify;
         if(fn) {
             fn(device)
+        }
+    }
+}
+
+function checkRuleConditional(conditional) {
+    /** Check conditions */
+    for(var i = 0; i < conditional.and.length; i++) {
+        var condition = conditional.and[i];
+        var device = getDevice(condition.deviceId);
+
+        if(device && (device.enabled !== condition.enabled)) {
+            return;
+        }
+    }
+    /** condition fulfilled */
+    for(var j = 0; j < conditional.then.length; j++) {
+        var then = conditional.then[j];
+        var rule = ruleByName(then.ruleName);
+        if(then.enabled) {
+            enableRule(rule);
+            logRuleChange(rule.name, 'conditional enabled');
+        } else {
+            disableRule(rule);
+            logRuleChange(rule.name, 'conditional disabled');
         }
     }
 }
@@ -219,6 +257,9 @@ function disableRule(rule) {
 }
 
 function enableRule(rule) {
+    if(rule.id === activeId) {
+        return;
+    }
     if(applyRule(rule)) {
         activeId = rule.id;
     }

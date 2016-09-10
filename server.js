@@ -108,6 +108,16 @@ app.post('/api/rule/:name/:action', function (req, res) {
         });
 });
 
+app.get('/api/conditionals', function (req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    bridge.getConditionals()
+        .then(function(conditionals) {
+            res.send(conditionals);
+        }, function(err) {
+            res.status(404).send(err);
+        });
+});
+
 app.use('/', express.static('frontend'));
 
 function storeConfig() {
