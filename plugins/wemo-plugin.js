@@ -7,8 +7,7 @@ var wemo = new Wemo();
 var LIGHT_DIMMABLE = "dimmableLight";
 var devices = [];
 
-exports.init = function(listener) {
-    console.log("Starts initiating wemo plugin");
+exports.init = function(listener, config) {
     wemo.discover(function(deviceInfo) {
         var client = wemo.client(deviceInfo);
         var modelName = deviceInfo.modelName;

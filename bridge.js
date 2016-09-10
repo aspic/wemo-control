@@ -12,7 +12,7 @@ exports.init = function(config) {
     rules = config.rules; 
 
     Object.keys(config.plugins).forEach(function(key) {
-        registerPlugin(key, require('./plugins/' + config.plugins[key]));
+        registerPlugin(key, require('./plugins/' + key), config.plugins[key]);
     });
     initPlugins(); 
 };
@@ -130,10 +130,12 @@ exports.controlRule = function(name, action) {
 };
 
 /** helpers */
-function registerPlugin(name, plugin) {
+function registerPlugin(name, plugin, pluginConfig) {
     plugins[name] = {
+        name: name,
         init: plugin.init,
-        getDevices: plugin.getDevices
+        getDevices: plugin.getDevices,
+        config: pluginConfig
     };
     logPlugin(name, true);
 }
@@ -166,7 +168,8 @@ function logPlugin(pluginName, enabled) {
 
 function initPlugins() {
     apply(function(plugin) {
-        plugin.init(stateListener);
+        console.log("Initiates plugin: " + plugin.name);
+        plugin.init(stateListener, plugin.config);
     });
 }
 
@@ -174,6 +177,14 @@ function initPlugins() {
 function stateListener(device) {
     if(device.type == 'sensor') {
         logStateChange(device.name, device.enabled);
+    }
+
+    var devices = exports.getDevices();
+    for(var i = 0; i < devices.length; i++) {
+        var fn = devices[i].notify;
+        if(fn) {
+            fn(device)
+        }
     }
 }
 
