@@ -2,9 +2,16 @@
     "host": {
         "port": 3000
     },
-    "plugins": {
-        "wemo": "wemo-plugin"
-    },
+    "plugins": [
+        {
+            "type": "wemo-plugin"
+        },
+        {
+            "type": "cmd-plugin",
+            "id": "echos",
+            "cmd": "echo 'echos this to stdout'"
+        }
+    ],
     "rules": [
         {
             "id": 0,
