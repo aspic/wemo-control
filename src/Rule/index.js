@@ -114,7 +114,7 @@ export default class Rule extends Component {
             return <div></div>;
         }
         return (<div>
-            <div className="row m-t-2">
+            <div className="row m-t-2 ">
                 <div className="col-md-10 col-xs-10 form-inline">
                     <h4><a onClick={this.toggleRule}><i className={toggle}/></a> {name} </h4>
                 </div>
@@ -124,7 +124,7 @@ export default class Rule extends Component {
                 </div>
             </div>
             <div className={detailClasses}>
-                <div className="col-md-10 col-xs-10">
+                <div className="col-md-10 col-xs-10 rule-section">
                     <div className="form-group">
                         {activeDevices}
                     </div>
@@ -133,6 +133,7 @@ export default class Rule extends Component {
                     <DeviceDropdown devices={availableDevices} addDevice={this.addDevice}/>
                 </div>
             </div>
+
         </div>);
     }
 }
