@@ -1,31 +1,42 @@
 /**
  * https://github.com/timonreinhard/wemo-client
  */
-var Wemo = require('wemo-client');
-var wemo = new Wemo();
+var WemoClient = require('wemo-client');
+var wemoClient = new WemoClient();
 
 var LIGHT_DIMMABLE = "dimmableLight";
 var devices = [];
 
-exports.init = function(listener, config) {
-    wemo.discover(function(deviceInfo) {
-        var client = wemo.client(deviceInfo);
+function Wemo(listener, config) {
+    this.devices = [];
+    this.config = config;
+    this.listener = listener;
+}
+
+Wemo.prototype.load = function () {
+    wemoClient.discover(function (deviceInfo) {
+        var client = wemoClient.client(deviceInfo);
         var modelName = deviceInfo.modelName;
-        if(modelName === "Bridge") {
-            client.getEndDevices(function(err, data){
+        if (modelName === "Bridge") {
+            client.getEndDevices(function (err, data) {
                 devices = devices.concat(loadDevices(data, client));
                 console.log("Wemo plugin initiated with " + devices.length + " devices");
             });
-        } else if(modelName === "Socket") {
-            devices.push(registerSocket(deviceInfo, client, listener));
+        } else if (modelName === "Socket") {
+            devices.push(registerSocket(deviceInfo, client, this.listener));
             console.log("Wemo plugin initiated with " + devices.length + " devices");
-        } else if(modelName === "Sensor") {
-            devices.push(registerSensor(deviceInfo, client, listener));
+        } else if (modelName === "Sensor") {
+            devices.push(registerSensor(deviceInfo, client, this.listener));
             console.log("Wemo plugin initiated with " + devices.length + " devices");
         } else {
             console.log("Unable to handle device with name: " + modelName);
         }
-    });
+    }.bind(this));
+    return this;
+};
+
+Wemo.prototype.getDevices = function () {
+    return devices;
 };
 
 function loadDevices(devices, client) {
@@ -111,6 +122,6 @@ function registerSensor(deviceInfo, client, listener) {
     return device;
 }
 
-exports.getDevices = function () {
-    return devices;
+exports.new = function(listener, config) {
+    return new Wemo(listener, config);
 };

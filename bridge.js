@@ -13,18 +13,17 @@ exports.init = function(config) {
     rules = config.rules;
     conditionals = config.conditionals;
 
-    Object.keys(config.plugins).forEach(function(key) {
-        registerPlugin(key, require('./plugins/' + key), config.plugins[key]);
+    plugins = config.plugins.map(function(plugin) {
+        return require('./plugins/' + plugin.type).new(stateListener, plugin).load();
     });
-    initPlugins(); 
 };
 
 
 exports.getDevices = function() {
     var devices = [];
-    apply(function(plugin) {
-        devices = [].concat(devices, plugin.getDevices());
-    });
+    for(var i = 0; i < plugins.length; i++) {
+        devices = [].concat(devices, plugins[i].getDevices());
+    }
     return devices;
 };
 
@@ -139,13 +138,14 @@ exports.controlRule = function(name, action) {
 
 /** helpers */
 function registerPlugin(name, plugin, pluginConfig) {
-    plugins[name] = {
+    var createdPlugin = {
         name: name,
         init: plugin.init,
         getDevices: plugin.getDevices,
         config: pluginConfig
     };
     logPlugin(name, true);
+    return createdPlugin;
 }
 
 /** Should only be called by log*methods */
@@ -172,13 +172,6 @@ function logStateChange(deviceName, enabled) {
 
 function logPlugin(pluginName, enabled) {
     log({type: 'plugin', name: pluginName, enabled: enabled});
-}
-
-function initPlugins() {
-    apply(function(plugin) {
-        console.log("Initiates plugin: " + plugin.name);
-        plugin.init(stateListener, plugin.config);
-    });
 }
 
 /** Notified when devices change state */
@@ -231,7 +224,7 @@ function apply(f) {
         if (plugins.hasOwnProperty(key)) {
             f(plugins[key]);
         }
-    } 
+    }
 }
 
 function toSetter(key) {

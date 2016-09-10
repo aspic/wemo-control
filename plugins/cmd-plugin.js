@@ -1,17 +1,21 @@
 /** Runs a shell command when some conditional is true */
 
 var exec = require('child_process').exec;
-var devices = [];
 
-exports.init = function(listener, config) {
+function CMD(listener, config) {
+    this.devices = [];
+    this.config = config;
+}
+
+CMD.prototype.load = function () {
     var device = {
-        id: 'cmd-' + config.id,
+        id: 'cmd-' + this.config.id,
         name: 'Command line plugin',
         type: 'cmd',
-        setEnabled: function(enabled, cb) {
-            if(enabled) {
-                exec(config.cmd, function(error, stdout, stderr) {
-                    if(error != null || stderr) {
+        setEnabled: function (enabled, cb) {
+            if (enabled) {
+                exec(this.config.cmd, function (error, stdout, stderr) {
+                    if (error != null || stderr) {
                         console.log("error " + error);
                         console.log("stderr " + stderr);
                     } else {
@@ -20,11 +24,16 @@ exports.init = function(listener, config) {
                 });
             }
             cb();
-        }
+        }.bind(this)
     };
-    devices = [device];
+    this.devices = [device];
+    return this;
 };
 
-exports.getDevices = function () {
-    return devices;
+CMD.prototype.getDevices = function () {
+    return this.devices;
+};
+
+exports.new = function (listener, config) {
+    return new CMD(listener, config);
 };
