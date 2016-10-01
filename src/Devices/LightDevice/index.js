@@ -2,7 +2,7 @@ import './index.css';
 import React, {Component} from 'react';
 
 import {Slider} from '../../index.js';
-import { postToggleDevice, postBrightness } from '../../ajax';
+import { postToggleDevice, postDeviceSetter } from '../../ajax';
 
 export default class LightDevice extends Component {
     constructor() {
@@ -48,7 +48,7 @@ export default class LightDevice extends Component {
     }
 
     dim(id, value) {
-        postBrightness(id, value, function(data) {
+        postDeviceSetter(id, 'brightness', value, function(data) {
             this.setState({device: data, clicked: data.enabled});
         }.bind(this));
     }
