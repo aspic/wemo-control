@@ -67,9 +67,10 @@ exports.setValue = function(id, key, value) {
         if(!device) {
             reject("device with id: " + id + " not found");
         }
-        var setter = toSetter(key);
-        if(device && typeof(device[setter]) === 'function') {
-            device[setter](value, function() {
+        var setter = device[toSetter(key)];
+
+        if(device && typeof(setter) === 'function') {
+            setter(value, function() {
                 resolve(device);
             });
         } else {

@@ -39,6 +39,17 @@ app.get('/api/device/:id', function (req, res) {
         });
 });
 
+app.post('/api/device/:id/:action/:value*?', function(req, res) {
+    var { id, action, value } = req.params;
+    res.setHeader('Content-Type', 'application/json');
+    bridge.setValue(id, action, value)
+        .then(function(result) {
+            res.send(result);
+        }, function(err) {
+            res.send({ error: err });
+        });
+});
+
 app.get('/api/device/:id/toggle', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
     var id = req.params.id;
