@@ -31,6 +31,16 @@ export function postToggleDevice(id, cb) {
     });
 }
 
+export function postDeviceSetter(deviceId, action, value, cb) {
+    $.ajax({
+        url: Globals.host + '/api/device/' + deviceId + '/' + action + '/' + value,
+        type: 'POST',
+        success: function (data) {
+            cb(data);
+        }
+    });
+}
+
 export function postBrightness(id, value, cb) {
     $.ajax(Globals.host + '/api/device/' + id + '/brightness/' + value).then(function (data) {
         cb(data);

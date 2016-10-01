@@ -1,5 +1,5 @@
 import React from 'react';
-import { LightDevice, SocketDevice, SensorDevice} from './index.js';
+import { LightDevice, SocketDevice, SensorDevice, PlayerDevice} from './index.js';
 
 export function mapDevices(devices, control) {
     return devices.map(function (device) {
@@ -9,6 +9,8 @@ export function mapDevices(devices, control) {
             return <SocketDevice key={device.id} device={device} valueControl={control}/>;
         } else if(device.type === 'sensor') {
             return <SensorDevice key={device.id} device={device}/>;
+        } else if(device.type === 'player') {
+            return <PlayerDevice key={device.id} device={device}/>;
         }
     });
 }
