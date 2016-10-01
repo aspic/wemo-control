@@ -67,10 +67,9 @@ exports.setValue = function(id, key, value) {
         if(!device) {
             reject("device with id: " + id + " not found");
         }
-        var setter = device[toSetter(key)];
-
-        if(device && typeof(setter) === 'function') {
-            setter(value, function() {
+        var setter = toSetter(key);
+        if(device && typeof(device[setter]) === 'function') {
+            device[setter](value, function() {
                 resolve(device);
             });
         } else {
@@ -136,18 +135,6 @@ exports.controlRule = function(name, action) {
         }
     }.bind(this));
 };
-
-/** helpers */
-function registerPlugin(name, plugin, pluginConfig) {
-    var createdPlugin = {
-        name: name,
-        init: plugin.init,
-        getDevices: plugin.getDevices,
-        config: pluginConfig
-    };
-    logPlugin(name, true);
-    return createdPlugin;
-}
 
 /** Should only be called by log*methods */
 function log(logObject) {
@@ -218,14 +205,6 @@ function getDevice(id) {
     for(var i = 0; i < devices.length; i++) {
         if(id === devices[i].id) {
             return devices[i];
-        }
-    }
-}
-
-function apply(f) {
-    for (var key in plugins) {
-        if (plugins.hasOwnProperty(key)) {
-            f(plugins[key]);
         }
     }
 }
