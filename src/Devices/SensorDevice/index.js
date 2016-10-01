@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { getDevice } from '../ajax';
+import { getDevice } from '../../ajax';
 
 export default class SocketDevice extends Component {
     constructor() {

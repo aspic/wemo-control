@@ -1,8 +1,8 @@
 import './index.css';
 import React, {Component} from 'react';
 
-import {Slider} from '../index.js';
-import { postToggleDevice, postBrightness } from '../ajax';
+import {Slider} from '../../index.js';
+import { postToggleDevice, postBrightness } from '../../ajax';
 
 export default class LightDevice extends Component {
     constructor() {

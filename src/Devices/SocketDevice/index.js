@@ -1,7 +1,7 @@
 import './index.css';
 import React, {Component} from 'react';
 
-import { postToggleDevice } from '../ajax';
+import { postToggleDevice } from '../../ajax';
 
 export default class SocketDevice extends Component {
     constructor() {
