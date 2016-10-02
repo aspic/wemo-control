@@ -25,12 +25,6 @@ export function getLog(cb) {
     });
 }
 
-export function postToggleDevice(id, cb) {
-    $.ajax(Globals.host + '/api/device/' + id + '/toggle').then(function(data) {
-        cb(data);
-    });
-}
-
 export function postDeviceSetter(deviceId, action, value, cb) {
     $.ajax({
         url: Globals.host + '/api/device/' + deviceId + '/' + action + '/' + value,
@@ -38,12 +32,6 @@ export function postDeviceSetter(deviceId, action, value, cb) {
         success: function (data) {
             cb(data);
         }
-    });
-}
-
-export function postBrightness(id, value, cb) {
-    $.ajax(Globals.host + '/api/device/' + id + '/brightness/' + value).then(function (data) {
-        cb(data);
     });
 }
 

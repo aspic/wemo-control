@@ -1,9 +1,7 @@
 var Heos = require('heos');
 var devices = [];
 
-function HeosPlugin(listener, config) {
-
-}
+function HeosPlugin(listener, config) {}
 
 exports.new = function(listener, config) {
     return new HeosPlugin(listener, config);
@@ -27,7 +25,7 @@ HeosPlugin.prototype.load = function () {
             // Pick the first and get what it is playing
             return players[0].getNowPlaying()
                 .then(function(media) {
-                    console.log('Playing:', media);
+                    // console.log('Playing:', media);
                 });
 
         })
@@ -43,17 +41,19 @@ HeosPlugin.prototype.getDevices = function() {
 };
 
 function registerPlayer(player) {
+
     return {
         id: String(player.pid),
         name: player.name,
         type: 'player',
+        playing: player.getNowPlaying().then(function(media) { return media; }), // TODO: Fetch on-demand
         setPlayNext: function (value, cb) {
             player.playNext();
-            cb();
+            cb(this);
         },
         setPlayPrevious: function (value, cb) {
             player.playPrevious();
-            cb();
+            cb(this);
         }
     }
 }

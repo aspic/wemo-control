@@ -1,4 +1,4 @@
-/** Runs a shell command when some conditional is true */
+/** Runs a shell command when some condition is met */
 
 var exec = require('child_process').exec;
 
@@ -23,7 +23,7 @@ CMD.prototype.load = function () {
                     }
                 });
             }
-            cb();
+            cb(this);
         }.bind(this)
     };
     this.devices = [device];

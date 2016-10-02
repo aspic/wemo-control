@@ -69,8 +69,8 @@ exports.setValue = function(id, key, value) {
         }
         var setter = toSetter(key);
         if(device && typeof(device[setter]) === 'function') {
-            device[setter](value, function() {
-                resolve(device);
+            device[setter](value, function(updatedDevice) {
+                resolve(updatedDevice);
             });
         } else {
             reject("device with id: " + id + " does not support setter: " + setter + "()");

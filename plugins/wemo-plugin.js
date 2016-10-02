@@ -52,14 +52,13 @@ function registerLight(device, client) {
         id: device.deviceId,
         name: device.friendlyName,
         type: 'light',
-        enabled: device.capabilities['10006'] === "1",
+        enabled: device.capabilities['10006'],
         brightness: device.capabilities['10008'],
-        setEnabled: function(enabled, cb) {
-            var enabledValue = enabled ? 1 : 0;
+        setEnabled: function(value, cb) {
             var device = this;
-            client.setDeviceStatus(this.id, 10006, enabledValue, function(err, resp) {
-                device.enabled = enabled;
-                cb();
+            client.setDeviceStatus(this.id, 10006, value, function(err, resp) {
+                device.enabled = value;
+                cb(device);
             });
         },
         setBrightness: function(value, cb) {
@@ -70,8 +69,8 @@ function registerLight(device, client) {
             }
             client.setDeviceStatus(this.id, 10008, value, function(err, resp) {
                 device.brightness = value;
-                device.enabled = value !== "0";
-                cb();
+                device.enabled = value !== "0" ? "1" : "0";
+                cb(device);
             });
         }
     }
@@ -82,14 +81,13 @@ function registerSocket(deviceInfo, client, listener) {
         id: deviceInfo.serialNumber,
         name: deviceInfo.friendlyName,
         type: 'socket',
-        enabled: deviceInfo.binaryState === '1',
-        setEnabled: function(enabled, cb) {
-            var enabledValue = enabled ? 1 : 0;
+        enabled: deviceInfo.binaryState,
+        setEnabled: function(value, cb) {
             var device = this;
-            client.setBinaryState(enabledValue, function(err, response) {
+            client.setBinaryState(value, function(err, response) {
                 if(!err) {
-                    device.enabled = enabled;
-                    cb();
+                    device.enabled = value;
+                    cb(device);
                 } else {
                     console.log(err);
                 }
@@ -97,7 +95,7 @@ function registerSocket(deviceInfo, client, listener) {
         }
     };
     client.on('binaryState', function(value) {
-        device.enabled = value === '1';
+        device.enabled = value;
         listener(device);
     });
     return device;

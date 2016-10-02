@@ -1,7 +1,7 @@
 import './index.css';
 import React, {Component} from 'react';
 
-import { postToggleDevice } from '../../ajax';
+import { postDeviceSetter } from '../../ajax';
 
 export default class SocketDevice extends Component {
     constructor() {
@@ -12,10 +12,7 @@ export default class SocketDevice extends Component {
 
     componentWillMount() {
         var device = this.props.device;
-        if (device.enabled) {
-            this.setState({clicked: true});
-        }
-        this.setState({device: device});
+        this.setState({device: device, clicked: device.enabled === "1"});
     }
 
     clicked() {
@@ -30,9 +27,9 @@ export default class SocketDevice extends Component {
     }
 
     toggle() {
-        var id = this.state.device.id;
-        postToggleDevice(id, function (device) {
-            this.setState({clicked: device.enabled, device: device});
+        const {id, enabled} = this.state.device;
+        postDeviceSetter(id, 'enabled', enabled === "1" ? 0 : 1, function (device) {
+            this.setState({clicked: device.enabled === "1", device: device});
         }.bind(this));
     }
 
